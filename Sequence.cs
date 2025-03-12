@@ -8,7 +8,7 @@ namespace Sequence
         {
             int initialNumber = 5;
             int maxNumber = 103;
-            int step = 7;
+            int cycleStep = 7;
 
             for (int i = initialNumber; i <= maxNumber;)
             {
