@@ -9,8 +9,8 @@ namespace ConsoleApp2
             int images = 52;
             int imagesInRow = 3;
 
-            int filledRow = 52 / 3;
-            int remainingImage = 52 % 3;
+            int filledRow = images / imagesInRow;
+            int remainingImage = images % imagesInRow;
 
             Console.WriteLine($"Полностью заполненных рядов - {filledRow}, картинки сверх меры - {remainingImage}.");
         }
