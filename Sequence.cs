@@ -13,7 +13,7 @@ namespace Sequence
             for (int i = initialNumber; i <= maxNumber;)
             {
                 Console.Write(i + " ");
-                i += step;
+                i += cycleStep;
             }
         }
     }
