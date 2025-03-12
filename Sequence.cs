@@ -6,10 +6,11 @@ namespace Sequence
     {
         static void Main(string[] args)
         {
+            int initialNumber = 5;
             int maxNumber = 103;
             int step = 7;
 
-            for (int i = 5; i <= maxNumber;)
+            for (int i = initialNumber; i <= maxNumber;)
             {
                 Console.Write(i + " ");
                 i += step;
