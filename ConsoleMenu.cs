@@ -12,16 +12,20 @@ namespace ConsoleMenu
             const string CommandClearConsole = "4";
             const string CommandExit = "5";
 
-            Random rand = new Random();
+            Random random = new Random();
             bool isWork = true;
-            int maxRandomNumber = 100;
+            int maxRandomNumber = 99;
             string userInput;
 
-            while(isWork)
+            while (isWork)
             {
-                Console.Write("Добро пожаловать!\nВы можете выбрать действия:\n1 - показать здоровье игрока;\n" +
-                    "2 - показать здоровье врага;\n3 - показать случайное число;\n4 - очистить консоль;\n" +
-                    "5 - выход.\nВаша команда: ");
+                Console.Write($"Добро пожаловать!\nВы можете выбрать:" +
+                    $"\n{CommandShowPlayerHealth} - показать здоровье игрока;" +
+                    $"\n{CommandShowEnemyHealth} - показать здоровье врага;" +
+                    $"\n{CommandShowRandomNumber} - показать случайное число;" +
+                    $"\n{CommandClearConsole} - очистить консоль;" +
+                    $"\n{CommandExit} - выход." +
+                    $"\nВаша команда: ");
 
                 userInput = Console.ReadLine();
 
@@ -34,7 +38,7 @@ namespace ConsoleMenu
                         Console.WriteLine("Здоровье врага равно 32 XP.");
                         break;
                     case CommandShowRandomNumber:
-                        Console.WriteLine(rand.Next(0, maxRandomNumber));
+                        Console.WriteLine(random.Next(0, maxRandomNumber + 1));
                         break;
                     case CommandClearConsole:
                         Console.Clear();
