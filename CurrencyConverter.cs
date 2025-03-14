@@ -14,6 +14,8 @@ namespace CurrencyConverter
             const string CommandExchangeDirhamsToDollars = "6";
             const string CommandExit = "7";
 
+            int cursorPositionX = 0;
+            int cursorPositionY = 3;
             float rublesInAccount = 1000000;
             float dollarsInAccount = 10000;
             float dirhamsInAccount = 100000;
@@ -31,7 +33,7 @@ namespace CurrencyConverter
             {
                 Console.WriteLine($"Ваш баланс {rublesInAccount} рублей, {dollarsInAccount} долларов, " +
                     $"{dirhamsInAccount} дирхам.");
-                Console.SetCursorPosition(0, 3);
+                Console.SetCursorPosition(cursorPositionX, cursorPositionY);
                 Console.Write($"Добро пожаловать в пункт обмена валют!\nВы можете:" +
                     $"\n{CommandExchangeRublesToDollars} - обмен рублей на доллары;" +
                     $"\n{CommandExchangeRublesToDirhams} - обмен рублей на дирхамы;" +
