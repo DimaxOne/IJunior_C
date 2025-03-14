@@ -6,21 +6,18 @@ namespace SumOfNumbers
     {
         static void Main(string[] args)
         {
-            Random rand = new Random();
+            Random random = new Random();
             int firstDivisor = 3;
             int secondDivisor = 5;
             int maxRandomNumber = 100;
             int sum = 0;
             int number;
-            bool canDivideWithoutRemainder;
 
-            number = rand.Next(0, maxRandomNumber);
+            number = random.Next(0, maxRandomNumber + 1);
 
             for (int i = 0; i <= number; i++)
             {
-                canDivideWithoutRemainder = i % firstDivisor == 0 || i % secondDivisor == 0;
-
-                if (canDivideWithoutRemainder)
+                if (i % firstDivisor == 0 || i % secondDivisor == 0)
                     sum += i;
             }
 
