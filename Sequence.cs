@@ -10,10 +10,9 @@ namespace Sequence
             int maxNumber = 103;
             int cycleStep = 7;
 
-            for (int i = initialNumber; i <= maxNumber;)
+            for (int i = initialNumber; i <= maxNumber; i += cycleStep)
             {
                 Console.Write(i + " ");
-                i += cycleStep;
             }
         }
     }
