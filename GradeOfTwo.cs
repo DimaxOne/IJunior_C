@@ -17,7 +17,7 @@ namespace GradeOfTwo
             number = random.Next(minimumValue, maximumValue + 1);
             currentNumber = factorizationNumber;
 
-            while(currentNumber < number)
+            while(currentNumber <= number)
             {
                 currentNumber *= factorizationNumber;
                 currentDegree++;
