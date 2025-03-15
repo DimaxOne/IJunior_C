@@ -6,7 +6,7 @@ namespace NameOutput
     {
         static void Main(string[] args)
         {
-            string otherRow = "";
+            string topAndBottomRow = "";
             string name;
             string middleRow;
             char symbol;
@@ -20,10 +20,10 @@ namespace NameOutput
 
             for (int i = 0; i < middleRow.Length; i++)
             {
-                otherRow += symbol;
+                topAndBottomRow += symbol;
             }
 
-            Console.WriteLine($"{otherRow}\n{middleRow}\n{otherRow}");
+            Console.WriteLine($"{topAndBottomRow}\n{middleRow}\n{topAndBottomRow}");
         }
     }
 }
