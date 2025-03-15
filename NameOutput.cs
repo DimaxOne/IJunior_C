@@ -6,10 +6,9 @@ namespace NameOutput
     {
         static void Main(string[] args)
         {
-            int extraLength = 2;
-            int rowCount = 3;
-            int middleRow;
+            string otherRow = "";
             string name;
+            string middleRow;
             char symbol;
 
             Console.Write("Введите Ваше имя: ");
@@ -17,23 +16,14 @@ namespace NameOutput
             Console.Write("Введите символ: ");
             symbol = Convert.ToChar(Console.ReadLine());
 
-            middleRow = rowCount / 2;
+            middleRow = symbol + name + symbol;
 
-            for (int i = 0; i < rowCount; i++)
+            for (int i = 0; i < middleRow.Length; i++)
             {
-                for (int j = 0; j < name.Length + extraLength; j++)
-                {
-                    if (i == middleRow)
-                    {
-                        Console.Write(symbol + name + symbol);
-                        break;
-                    }
-
-                    Console.Write(symbol);
-                }
-
-                Console.WriteLine();
+                otherRow += symbol;
             }
+
+            Console.WriteLine($"{otherRow}\n{middleRow}\n{otherRow}");
         }
     }
 }
