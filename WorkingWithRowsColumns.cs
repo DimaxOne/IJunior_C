@@ -25,14 +25,12 @@ namespace WorkingWithRowsColumns
 
             for (int i = 0; i < arrow.GetLength(0); i++)
             {
-                for (int j = 0; j < arrow.GetLength(1); j++)
-                {
-                    if (i == amountRowIndex)
-                        sumResult += arrow[i, j];
+                sumResult += arrow[amountRowIndex, i];
+            }
 
-                    if (j == multiplicationСolumnIndex)
-                        multiplicationResult *= arrow[i, j];
-                }
+            for (int i = 0; i < arrow.GetLength(1); i++)
+            {
+                multiplicationResult *= arrow[i, multiplicationСolumnIndex];
             }
 
             for (int i = 0; i < arrow.GetLength(0); i++)
