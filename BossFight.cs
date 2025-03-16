@@ -18,6 +18,7 @@ namespace BossFight
             int maximumPlayerHealth = 110;
             int maximumPlayerMana = 3;
             int fireBallDamage = 15;
+            int fireBallManaCost = 1;
             int explosionDamage = 39;
             int healthRecovery = 15;
             int manaRecovery = 1;
@@ -33,7 +34,7 @@ namespace BossFight
             {
                 Console.Write($"Ваше здоровье {playerHealth}, мана {playerMana}.\nЗдоровье босса {bossHealth}.\nДоступные действия:" +
                     $"\n{CommandSimpleAttack} - обычная атака;" +
-                    $"\n{CommandUseFireBall} - удар огненным шаром (расходует 1 ману);" +
+                    $"\n{CommandUseFireBall} - удар огненным шаром (расходует {fireBallManaCost} ману);" +
                     $"\n{CommandUseExplosion} - взрыв (может применяться после огненного шара);" +
                     $"\n{CommandHealing} - восстановление здоровья и маны (осталось {availableHealingCount} применений)." +
                     $"\nВаш выбор: ");
