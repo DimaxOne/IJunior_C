@@ -75,14 +75,14 @@ namespace BossFight
                     case CommandHealing:
                         if (availableHealingCount > 0)
                         {
-                            if (playerHealth + healthRecovery <= maximumPlayerHealth)
-                                playerHealth += healthRecovery;
-                            else
+                            playerHealth += healthRecovery;
+
+                            if (playerHealth > maximumPlayerHealth)
                                 playerHealth = maximumPlayerHealth;
 
-                            if (playerMana + manaRecovery <= maximumPlayerMana)
-                                playerMana += manaRecovery;
-                            else
+                            playerMana += manaRecovery;
+
+                            if (playerMana > maximumPlayerMana)
                                 playerMana = maximumPlayerMana;
 
                             availableHealingCount--;
@@ -109,11 +109,9 @@ namespace BossFight
 
             if (playerHealth <= 0 && bossHealth <= 0)
                 Console.WriteLine("Никто не одержал победу. Ничья.");
-
-            if (playerHealth <= 0)
+            else if (playerHealth <= 0)
                 Console.WriteLine("Босс победил.");
-
-            if (bossHealth <= 0)
+            else
                 Console.WriteLine("Победа игрока.");
         }
     }
