@@ -7,7 +7,7 @@ namespace LargestElement
         static void Main(string[] args)
         {
             Random random = new Random();
-            int[,] arrow = new int[10, 10];
+            int[,] numbers = new int[10, 10];
             int maximumRandomValue = 99;
             int minimumRandomValue = 10;
             int replacementNumber = 0;
@@ -15,14 +15,14 @@ namespace LargestElement
 
             largestElement = minimumRandomValue;
 
-            for (int i = 0; i < arrow.GetLength(0); i++)
+            for (int i = 0; i < numbers.GetLength(0); i++)
             {
-                for (int j = 0; j < arrow.GetLength(1); j++)
+                for (int j = 0; j < numbers.GetLength(1); j++)
                 {
-                    arrow[i, j] = random.Next(minimumRandomValue, maximumRandomValue + 1);
+                    numbers[i, j] = random.Next(minimumRandomValue, maximumRandomValue + 1);
 
-                    if (arrow[i, j] > largestElement)
-                        largestElement = arrow[i, j];
+                    if (numbers[i, j] > largestElement)
+                        largestElement = numbers[i, j];
                 }
             }
 
@@ -30,11 +30,11 @@ namespace LargestElement
 
             Console.WriteLine("Исходная матрица: ");
 
-            for (int i = 0; i < arrow.GetLength(0); i++)
+            for (int i = 0; i < numbers.GetLength(0); i++)
             {
-                for (int j = 0; j < arrow.GetLength(1); j++)
+                for (int j = 0; j < numbers.GetLength(1); j++)
                 {
-                    Console.Write(arrow[i, j] + " ");
+                    Console.Write(numbers[i, j] + " ");
                 }
 
                 Console.WriteLine();
@@ -42,14 +42,14 @@ namespace LargestElement
 
             Console.WriteLine("Полученная матрица: ");
 
-            for (int i = 0; i < arrow.GetLength(0); i++)
+            for (int i = 0; i < numbers.GetLength(0); i++)
             {
-                for (int j = 0; j < arrow.GetLength(1); j++)
+                for (int j = 0; j < numbers.GetLength(1); j++)
                 {
-                    if (arrow[i, j] == largestElement)
-                        Console.Write(replacementNumber + "  ");
-                    else
-                        Console.Write(arrow[i, j] + " ");
+                    if (numbers[i, j] == largestElement)
+                        numbers[i, j] = replacementNumber;
+
+                    Console.Write(numbers[i, j] + " ");
                 }
 
                 Console.WriteLine();
