@@ -47,7 +47,7 @@ namespace LargestElement
                 for (int j = 0; j < arrow.GetLength(1); j++)
                 {
                     if (arrow[i, j] == largestElement)
-                        Console.Write(replacementNumber + " ");
+                        Console.Write(replacementNumber + "  ");
                     else
                         Console.Write(arrow[i, j] + " ");
                 }
