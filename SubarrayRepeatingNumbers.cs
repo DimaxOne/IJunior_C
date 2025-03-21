@@ -47,7 +47,7 @@ namespace SubarrayRepeatingNumbers
             if(isRepetition)
             {
                 Console.WriteLine("{" + string.Join(", ", numbers) + 
-                    $"}} - число { maximumNumberRepeated} повторяется { maximumRepetition} раза подряд.");
+                    $"}} - число {maximumNumberRepeated} повторяется {maximumRepetition} раза подряд.");
             }
             else
             {
