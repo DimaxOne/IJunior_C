@@ -10,7 +10,6 @@ namespace SortingNumbers
             int[] numbers = new int[15];
             int maximumRandomValue = 15;
             int minimumRandomValue = 0;
-            int indexIteration = 0;
             int templateNumber;
 
             for (int i = 0; i < numbers.Length; i++)
@@ -20,18 +19,17 @@ namespace SortingNumbers
 
             Console.WriteLine(string.Join(" ", numbers));
 
-            while (indexIteration < numbers.Length - 1)
+            for (int i = 0; i < numbers.Length - 1; i++)
             {
-                if (numbers[indexIteration] > numbers[indexIteration + 1])
+                for (int j = i + 1; j < numbers.Length; j++)
                 {
-                    templateNumber = numbers[indexIteration + 1];
-                    numbers[indexIteration + 1] = numbers[indexIteration];
-                    numbers[indexIteration] = templateNumber;
-                    indexIteration = 0;
-                    continue;
+                    if (numbers[i] > numbers[j])
+                    {
+                        templateNumber = numbers[i];
+                        numbers[i] = numbers[j];
+                        numbers[j] = templateNumber;
+                    }
                 }
-
-                indexIteration++;
             }
 
             Console.WriteLine(string.Join(" ", numbers));
