@@ -23,6 +23,9 @@ namespace ShiftingArrayValues
 
             positionShiftIndex = Convert.ToInt32(Console.ReadLine());
 
+            if (positionShiftIndex >= numbers.Length)
+                positionShiftIndex %= numbers.Length;
+
             for (int i = 0; i < positionShiftIndex; i++)
             {
                 templateNumber = numbers[0];
