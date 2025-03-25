@@ -9,33 +9,28 @@ namespace StapledExpression
             string symbols = "((()))((((()))))";
             char openSymbol = '(';
             char closeSymbol = ')';
-            int openSymbolCount = 0;
-            int closeSymbolCount = 0;
-            int maximumDepth = 0;
             bool isCorrectExpression = true;
-            int currentDepth;
+            int currentDepth = 0;
+            int maximumDepth = 0;
 
             foreach (char symbol in symbols)
             {
                 if (symbol == openSymbol)
-                    openSymbolCount++;
+                    currentDepth++;
                 else if (symbol == closeSymbol)
-                    closeSymbolCount++;
+                    currentDepth--;
 
-                if (openSymbolCount >= closeSymbolCount)
-                {
-                    currentDepth = openSymbolCount - closeSymbolCount;
-
-                    if (currentDepth > maximumDepth)
-                        maximumDepth = currentDepth;
-                }
-                else
+                if (currentDepth < 0)
                 {
                     isCorrectExpression = false;
+                    break;
                 }
+                    
+                if (currentDepth > maximumDepth)
+                    maximumDepth = currentDepth;
             }
 
-            if (openSymbolCount != closeSymbolCount)
+            if (currentDepth != 0)
                 isCorrectExpression = false;
 
             if (isCorrectExpression)
