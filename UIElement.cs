@@ -7,16 +7,17 @@ namespace UIElement
         static void Main(string[] args)
         {
             DrowBar("Health", 40, 10, '#', 0, ConsoleColor.Red);
-            DrowBar("Mana", 90, 16, 'I', 2, ConsoleColor.Blue, emptyBar: '/');
+            DrowBar("Mana", 70, 16, 'I', 1, ConsoleColor.Blue, emptyBar: '/');
         }
 
         private static void DrowBar(string name, int currentPercentValue, int maximumValue, char filledSymbol, int positionY, ConsoleColor color, char emptyBar = '_')
         {
             char openBarSymbol = '[';
             char closeBarSymbol = ']';
+            int maximumPercent = 100;
             int valueInBar;
 
-            valueInBar = currentPercentValue * maximumValue / 100;
+            valueInBar = currentPercentValue * maximumValue / maximumPercent;
 
             if (positionY >= 0)
                 Console.SetCursorPosition(0, positionY);
