@@ -6,14 +6,17 @@ namespace UIElement
     {
         static void Main(string[] args)
         {
-            DrowBar("Health", 4, 10, '#', 0, ConsoleColor.Red);
-            DrowBar("Mana", 9, 16, 'I', 2, ConsoleColor.Blue, emptyBar: '/');
+            DrowBar("Health", 40, 10, '#', 0, ConsoleColor.Red);
+            DrowBar("Mana", 90, 16, 'I', 2, ConsoleColor.Blue, emptyBar: '/');
         }
 
-        private static void DrowBar(string name, int currentValue, int maximumValue, char filledSymbol, int positionY, ConsoleColor color, char emptyBar = '_')
+        private static void DrowBar(string name, int currentPercentValue, int maximumValue, char filledSymbol, int positionY, ConsoleColor color, char emptyBar = '_')
         {
             char openBarSymbol = '[';
             char closeBarSymbol = ']';
+            int valueInBar;
+
+            valueInBar = currentPercentValue * maximumValue / 100;
 
             if (positionY >= 0)
                 Console.SetCursorPosition(0, positionY);
@@ -25,14 +28,14 @@ namespace UIElement
             Console.BackgroundColor = color;
             Console.Write(openBarSymbol);
 
-            for (int i = 0; i < currentValue; i++)
+            for (int i = 0; i < valueInBar; i++)
             {
                 Console.Write(filledSymbol);
             }
 
             Console.BackgroundColor = defaultColor;
 
-            for (int i = currentValue; i < maximumValue; i++)
+            for (int i = valueInBar; i < maximumValue; i++)
             {
                 Console.Write(emptyBar);
             }
