@@ -15,12 +15,13 @@ namespace UIElement
             char openBarSymbol = '[';
             char closeBarSymbol = ']';
             int maximumPercent = 100;
+            int positionX = 0;
             int valueInBar;
 
             valueInBar = currentPercentValue * maximumValue / maximumPercent;
 
             if (positionY >= 0)
-                Console.SetCursorPosition(0, positionY);
+                Console.SetCursorPosition(positionX, positionY);
             else
                 Console.WriteLine(" - Ось Y указана некорректно.");
 
