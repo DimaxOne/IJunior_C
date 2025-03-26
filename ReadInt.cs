@@ -15,13 +15,12 @@ namespace ReadInt
             int number = 0;
             string userInput;
 
-            while(!isNumber)
+            while(isNumber == false)
             {
                 Console.Write("Введите число: ");
                 userInput = Console.ReadLine();
-                
-                if(int.TryParse(userInput, out number))
-                    isNumber = true;
+
+                isNumber = int.TryParse(userInput, out number);
             }
 
             return number;
