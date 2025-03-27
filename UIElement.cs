@@ -6,43 +6,48 @@ namespace UIElement
     {
         static void Main(string[] args)
         {
-            DrowBar("Health", 40, 10, '#', 0, ConsoleColor.Red);
-            DrowBar("Mana", 70, 16, 'I', 1, ConsoleColor.Blue, emptyBar: '/');
+            DrowBarsGraph("Health", 40, 10, '#', 0, ConsoleColor.Red);
+            DrowBarsGraph("Mana", 70, 16, 'I', 1, ConsoleColor.Blue, emptyBar: '/');
         }
 
-        private static void DrowBar(string name, int currentPercentValue, int maximumValue, char filledSymbol, int positionY, ConsoleColor color, char emptyBar = '_')
+        private static void DrowBarsGraph(string name, int currentPercentValue, int maximumValue, char filledSymbol, int positionY, ConsoleColor color, char emptyBar = '_')
         {
-            char openBarSymbol = '[';
-            char closeBarSymbol = ']';
+            ConsoleColor defaultColor = Console.BackgroundColor;
             int maximumPercent = 100;
             int positionX = 0;
-            int valueInBar;
-
-            valueInBar = currentPercentValue * maximumValue / maximumPercent;
+            int valueInBars;
+            int emptyBars;
 
             if (positionY >= 0)
                 Console.SetCursorPosition(positionX, positionY);
             else
                 Console.WriteLine(" - Ось Y указана некорректно.");
 
+            valueInBars = currentPercentValue * maximumValue / maximumPercent;
+            emptyBars = maximumValue - valueInBars;
+
             Console.Write($"{name}: ");
-            ConsoleColor defaultColor = Console.BackgroundColor;
             Console.BackgroundColor = color;
-            Console.Write(openBarSymbol);
-
-            for (int i = 0; i < valueInBar; i++)
-            {
-                Console.Write(filledSymbol);
-            }
-
+            DrowBars(valueInBars, true, filledSymbol);
             Console.BackgroundColor = defaultColor;
+            DrowBars(emptyBars, false, emptyBar);
+        }
 
-            for (int i = valueInBar; i < maximumValue; i++)
+        private static void DrowBars(int barsCount, bool isFirstPart, char symbol)
+        {
+            char openBarSymbol = '[';
+            char closeBarSymbol = ']';
+
+            if (isFirstPart)
+                Console.Write(openBarSymbol);
+
+            for (int i = 0; i < barsCount; i++)
             {
-                Console.Write(emptyBar);
+                Console.Write(symbol);
             }
 
-            Console.Write(closeBarSymbol);
+            if (isFirstPart == false)
+                Console.Write(closeBarSymbol);
         }
     }
 }
