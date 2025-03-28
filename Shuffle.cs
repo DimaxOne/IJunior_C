@@ -6,28 +6,25 @@ namespace Shuffle
     {
         static void Main(string[] args)
         {
-            int[] array;
+            int[] array = new int[CreateRandomLenght()];
 
-            array = CreateRandomLenghtArray();
-            FilledArray(array);
-            ShowArray(array);
-            ShuffleArray(array);
+            Populate(array);
+            Show(array);
+            Shuffle(array);
             Console.WriteLine("\n");
-            ShowArray(array);
+            Show(array);
         }
 
-        private static int[] CreateRandomLenghtArray()
+        private static int CreateRandomLenght()
         {
             Random random = new Random();
             int maximumRandomValue = 30;
             int minimumRandomValue = 5;
 
-            int[] array = new int[random.Next(minimumRandomValue, maximumRandomValue + 1)];
-
-            return array;
+            return random.Next(minimumRandomValue, maximumRandomValue + 1);
         }
 
-        private static void FilledArray(int[] array)
+        private static void Populate(int[] array)
         {
             Random random = new Random();
             int maximumRandomValue = 99;
@@ -39,24 +36,22 @@ namespace Shuffle
             }
         }
 
-        private static void ShuffleArray(int[] array)
+        private static void Shuffle(int[] array)
         {
             Random random = new Random();
-            int maximumRandomValue = array.Length - 1;
-            int minimumRandomValue = 0;
             int templateNumber;
             int randomIndex;
 
             for (int i = 0; i < array.Length; i++)
             {
-                randomIndex = random.Next(minimumRandomValue, maximumRandomValue + 1);
+                randomIndex = random.Next(array.Length);
                 templateNumber = array[i];
                 array[i] = array[randomIndex];
                 array[randomIndex] = templateNumber;
             }
         }
 
-        private static void ShowArray(int[] array)
+        private static void Show(int[] array)
         {
             foreach (int number in array)
             {
