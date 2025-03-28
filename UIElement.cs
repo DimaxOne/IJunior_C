@@ -6,13 +6,15 @@ namespace UIElement
     {
         static void Main(string[] args)
         {
-            DrowBarsGraph("Health", 40, 10, '#', 0, ConsoleColor.Red);
-            DrowBarsGraph("Mana", 70, 16, 'I', 1, ConsoleColor.Blue, emptyBar: '/');
+            DrowBarGraph("Health", 40, 10, '#', 0, ConsoleColor.Red);
+            DrowBarGraph("Mana", 70, 16, 'I', 1, ConsoleColor.Blue, emptyBar: '/');
         }
 
-        private static void DrowBarsGraph(string name, int currentPercentValue, int maximumValue, char filledSymbol, int positionY, ConsoleColor color, char emptyBar = '_')
+        private static void DrowBarGraph(string name, int currentPercentValue, int maximumValue, char filledSymbol, int positionY, ConsoleColor color, char emptyBar = '_')
         {
             ConsoleColor defaultColor = Console.BackgroundColor;
+            char openBarSymbol = '[';
+            char closeBarSymbol = ']';
             int maximumPercent = 100;
             int positionX = 0;
             int valueInBars;
@@ -28,26 +30,19 @@ namespace UIElement
 
             Console.Write($"{name}: ");
             Console.BackgroundColor = color;
-            DrowBars(valueInBars, true, filledSymbol);
+            Console.Write(openBarSymbol);
+            DrowBar(valueInBars, filledSymbol);
             Console.BackgroundColor = defaultColor;
-            DrowBars(emptyBars, false, emptyBar);
+            DrowBar(emptyBars, emptyBar);
+            Console.Write(closeBarSymbol);
         }
 
-        private static void DrowBars(int barsCount, bool isFirstPart, char symbol)
+        private static void DrowBar(int barsCount, char symbol)
         {
-            char openBarSymbol = '[';
-            char closeBarSymbol = ']';
-
-            if (isFirstPart)
-                Console.Write(openBarSymbol);
-
             for (int i = 0; i < barsCount; i++)
             {
                 Console.Write(symbol);
             }
-
-            if (isFirstPart == false)
-                Console.Write(closeBarSymbol);
         }
     }
 }
