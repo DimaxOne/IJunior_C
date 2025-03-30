@@ -56,11 +56,11 @@ namespace PersonnelRecords
 
         private static void AddDossier(ref string[] fullNames, ref string[] positions)
         {
-            fullNames = Expand(fullNames, GetUserInput("Введите полное имя сотрудника (Ф.И.О): "));
-            positions = Expand(positions, GetUserInput("Введите должность сотрудника: "));
+            fullNames = AddData(fullNames, GetUserInput("Введите полное имя сотрудника (Ф.И.О): "));
+            positions = AddData(positions, GetUserInput("Введите должность сотрудника: "));
         }
 
-        private static string[] Expand(string[] array, string employeeData)
+        private static string[] AddData(string[] array, string employeeData)
         {
             string[] templateArray = new string[array.Length + 1];
 
@@ -81,7 +81,7 @@ namespace PersonnelRecords
         {
             int index = 0;
 
-            if (GetIndex(ref index) && index >= 0 && fullNames.Length > index)
+            if (TryGetIndex(ref index) && index >= 0 && fullNames.Length > index)
             {
                 fullNames = ReduceArray(fullNames, index);
                 positions = ReduceArray(positions, index);
@@ -92,7 +92,7 @@ namespace PersonnelRecords
             }
         }
 
-        private static bool GetIndex(ref int index)
+        private static bool TryGetIndex(ref int index)
         {
             if (int.TryParse(GetUserInput("Введите порядковый номер досье для удаления: "), out int userNumber))
             {
@@ -111,8 +111,7 @@ namespace PersonnelRecords
 
             for (int i = 0; i < index; i++)
             {
-                if (i < index)
-                    templateArray[i] = array[i];
+                templateArray[i] = array[i];
             }
 
             for (int i = index + 1; i < array.Length; i++)
@@ -134,10 +133,10 @@ namespace PersonnelRecords
                 {
                     Console.WriteLine(fullName);
                     isSuccessfulSearch = true;
-                } 
+                }
             }
 
-            if(isSuccessfulSearch == false)
+            if (isSuccessfulSearch == false)
                 Console.WriteLine("Данной фамилии в базе нет.");
         }
 
