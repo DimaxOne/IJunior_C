@@ -40,7 +40,7 @@ namespace PersonnelRecords
                         break;
 
                     case CommandSearchSurnames:
-                        SearchSurnames(fullNamesOfEmployees);
+                        SearchSurname(fullNamesOfEmployees);
                         break;
 
                     case CommandExit:
@@ -123,7 +123,7 @@ namespace PersonnelRecords
             return templateArray;
         }
 
-        private static void SearchSurnames(string[] array)
+        private static void SearchSurname(string[] array)
         {
             string surname = GetUserInput("Введите фамилию для поиска: ");
             bool isSuccessfulSearch = false;
