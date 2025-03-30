@@ -12,8 +12,8 @@ namespace PersonnelRecords
             const string CommandSearchSurnames = "4";
             const string CommandExit = "5";
 
-            string[] fullNamesOfEmployees = new string[0];
-            string[] positions = new string[0];
+            string[] fullNamesOfEmployees = { "Богатьков Павел Николаевич", "Гейб Виктор Франкович", "Петров Василий Иванович" };
+            string[] positions = { "HR менеджер", "IQ менеджер", "Слесарь" };
             bool isWork = true;
             string userInput;
 
@@ -31,12 +31,7 @@ namespace PersonnelRecords
                 switch (userInput)
                 {
                     case CommandAddDossier:
-                        userInput = GetUserInput("Введите полное имя сотрудника (Ф.И.О): ");
-                        fullNamesOfEmployees = Expand(fullNamesOfEmployees);
-                        FillEmployeeData(fullNamesOfEmployees, userInput);
-                        userInput = GetUserInput("Введите должность сотрудника: ");
-                        positions = Expand(positions);
-                        FillEmployeeData(positions, userInput);
+                        AddDossier(ref fullNamesOfEmployees, ref positions);
                         break;
 
                     case CommandPullAllDossiers:
@@ -44,26 +39,11 @@ namespace PersonnelRecords
                         break;
 
                     case CommandRemoveDossier:
-                        userInput = GetUserInput("Введите порядковый номер досье для удаления: ");
-
-                        if (int.TryParse(userInput, out int index))
-                        {
-                            if (fullNamesOfEmployees.Length < index || index < 0)
-                            {
-                                Console.WriteLine("Некорректный порядковый номер досье.");
-                            }
-                            else
-                            {
-                                fullNamesOfEmployees = RemoveDossier(fullNamesOfEmployees, index - 1);
-                                positions = RemoveDossier(positions, index - 1);
-                            }
-                        }
-
+                        RemoveDossier(ref fullNamesOfEmployees, ref positions);
                         break;
 
                     case CommandSearchSurnames:
-                        userInput = GetUserInput("Введите фамилию для поиска: ");
-                        SearchSurnames(fullNamesOfEmployees, userInput);
+                        SearchSurnames(fullNamesOfEmployees);
                         break;
 
                     case CommandExit:
@@ -77,12 +57,13 @@ namespace PersonnelRecords
             }
         }
 
-        private static void FillEmployeeData(string[] array, string employeeInformation)
+        private static void AddDossier(ref string[] fullNames, ref string[] positions)
         {
-            array[array.Length - 1] = employeeInformation;
+            fullNames = Expand(fullNames, GetUserInput("Введите полное имя сотрудника (Ф.И.О): "));
+            positions = Expand(positions, GetUserInput("Введите должность сотрудника: "));
         }
 
-        private static string[] Expand(string[] array)
+        private static string[] Expand(string[] array, string employeeData)
         {
             string[] templateArray = new string[array.Length + 1];
 
@@ -94,33 +75,73 @@ namespace PersonnelRecords
                 }
             }
 
+            templateArray[templateArray.Length - 1] = employeeData;
+
             return templateArray;
         }
 
-        private static string[] RemoveDossier(string[] array, int index)
+        private static void RemoveDossier(ref string[] fullNames, ref string[] positions)
+        {
+            int index = 0;
+
+            if (GetIndex(ref index) && index >= 0 && fullNames.Length > index)
+            {
+                fullNames = ReduceArray(fullNames, index);
+                positions = ReduceArray(positions, index);
+            }
+            else
+            {
+                Console.WriteLine("Некорректный порядковый номер для удаления");
+            }
+        }
+
+        private static bool GetIndex(ref int index)
+        {
+            if (int.TryParse(GetUserInput("Введите порядковый номер досье для удаления: "), out int userNumber))
+            {
+                index = userNumber - 1;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private static string[] ReduceArray(string[] array, int index)
         {
             string[] templateArray = new string[array.Length - 1];
 
-            for (int i = 0; i < array.Length; i++)
+            for (int i = 0; i < index; i++)
             {
                 if (i < index)
                     templateArray[i] = array[i];
-                else if (i == index)
-                    continue;
-                else
-                    templateArray[i - 1] = array[i];
+            }
+
+            for (int i = index + 1; i < array.Length; i++)
+            {
+                templateArray[i - 1] = array[i];
             }
 
             return templateArray;
         }
 
-        private static void SearchSurnames(string[] array, string surname)
+        private static void SearchSurnames(string[] array)
         {
+            string surname = GetUserInput("Введите фамилию для поиска: ");
+            bool isSuccessfulSearch = false;
+
             foreach (string fullName in array)
             {
                 if (GetSurname(fullName) == surname)
+                {
                     Console.WriteLine(fullName);
+                    isSuccessfulSearch = true;
+                } 
             }
+
+            if(isSuccessfulSearch == false)
+                Console.WriteLine("Данной фамилии в базе нет.");
         }
 
         private static string GetSurname(string fullName)
