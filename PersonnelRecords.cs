@@ -15,7 +15,6 @@ namespace PersonnelRecords
             string[] fullNamesOfEmployees = { "Богатьков Павел Николаевич", "Гейб Виктор Франкович", "Петров Василий Иванович" };
             string[] positions = { "HR менеджер", "IQ менеджер", "Слесарь" };
             bool isWork = true;
-            string userInput;
 
             while (isWork)
             {
@@ -26,9 +25,7 @@ namespace PersonnelRecords
                     $"\n {CommandSearchSurnames} - поиск по фамилии;" +
                     $"\n {CommandExit} - выход.\n");
 
-                userInput = GetUserInput("Введите команду: ");
-
-                switch (userInput)
+                switch (GetUserInput("Введите команду: "))
                 {
                     case CommandAddDossier:
                         AddDossier(ref fullNamesOfEmployees, ref positions);
