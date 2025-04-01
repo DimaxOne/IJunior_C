@@ -33,11 +33,17 @@ namespace BraveNewWorld
             char wall = '#';
             char candy = '$';
             char empty = ' ';
+            char up = 'w';
+            char down = 's';
+            char left = 'a';
+            char right = 'd';
+            char exit = 'p';
             bool isWork = true;
             int[] playerPosition = { 1, 1 };
             int[] scorePosition = { 0, map.GetLength(1) };
             int score = 0;
             int[] direction;
+            ConsoleKeyInfo pressedKey;
 
             Console.CursorVisible = false;
 
@@ -48,12 +54,15 @@ namespace BraveNewWorld
                 DrawMap(map);
                 DrawPlayer(playerPosition[0], playerPosition[1], player);
                 ShowScore(score, scorePosition);
-                direction = GetDirection(Console.ReadKey());
+                pressedKey = Console.ReadKey();
 
-                if (CheckWall(map, playerPosition, direction, wall) == false)
+                isWork = Exit(pressedKey, exit);
+                direction = GetDirection(pressedKey, up, down, left, right);
+
+                if (CanMove(map, playerPosition, direction, wall) == false)
                 {
-                    ChangePosition(playerPosition, direction);
-                    CheckCandy(ref score, playerPosition, map, candy, empty);
+                    Move(playerPosition, direction);
+                    score = TakeСandy(score, playerPosition, map, candy, empty);
                 }
             }
         }
@@ -82,23 +91,23 @@ namespace BraveNewWorld
             Console.WriteLine($"Счет: {score}");
         }
 
-        private static int[] GetDirection(ConsoleKeyInfo pressedKey)
+        private static int[] GetDirection(ConsoleKeyInfo pressedKey, char up, char down, char left, char right)
         {
             int[] direction = { 0, 0 };
 
-            if (pressedKey.Key == ConsoleKey.W)
+            if (pressedKey.KeyChar == up)
             {
                 direction[1] = -1;
             }
-            else if (pressedKey.Key == ConsoleKey.S)
+            else if (pressedKey.KeyChar == down)
             {
                 direction[1] = 1;
             }
-            else if (pressedKey.Key == ConsoleKey.A)
+            else if (pressedKey.KeyChar == left)
             {
                 direction[0] = -1;
             }
-            else if (pressedKey.Key == ConsoleKey.D)
+            else if (pressedKey.KeyChar == right)
             {
                 direction[0] = 1;
             }
@@ -106,15 +115,25 @@ namespace BraveNewWorld
             return direction;
         }
 
-        private static void ChangePosition(int[] playerPosition, int[] direction)
+        private static bool Exit(ConsoleKeyInfo pressedKey, char exit)
         {
-            for (int i = 0; i < playerPosition.Length; i++)
+            if (pressedKey.KeyChar == exit)
             {
-                playerPosition[i] += direction[i];
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
 
-        private static bool CheckWall(char[,] map, int[] playerPosition, int[] direction, char wall)
+        private static void Move(int[] playerPosition, int[] direction)
+        {
+            playerPosition[0] += direction[0];
+            playerPosition[1] += direction[1];
+        }
+
+        private static bool CanMove(char[,] map, int[] playerPosition, int[] direction, char wall)
         {
             if (map[playerPosition[1] + direction[1], playerPosition[0] + direction[0]] == wall)
             {
@@ -126,13 +145,15 @@ namespace BraveNewWorld
             }
         }
 
-        private static void CheckCandy(ref int score, int[] playerPosition, char[,] map, char candy, char empty)
+        private static int TakeСandy(int score, int[] playerPosition, char[,] map, char candy, char empty)
         {
             if (map[playerPosition[1], playerPosition[0]] == candy)
             {
                 map[playerPosition[1], playerPosition[0]] = empty;
                 score++;
             }
+
+            return score;
         }
     }
 }
