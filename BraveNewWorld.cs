@@ -41,6 +41,8 @@ namespace BraveNewWorld
             bool isWork = true;
             int[] playerPosition = { 1, 1 };
             int[] scorePosition = { 0, map.GetLength(1) };
+            int nextPositionX = 0;
+            int nextPositionY = 0;
             int score = 0;
             int[] direction;
             ConsoleKeyInfo pressedKey;
@@ -58,10 +60,11 @@ namespace BraveNewWorld
 
                 isWork = Exit(pressedKey, exit);
                 direction = GetDirection(pressedKey, up, down, left, right);
+                GetNextPosition(ref nextPositionX, ref nextPositionY, playerPosition, direction);
 
-                if (CanMove(map, playerPosition, direction, wall) == false)
+                if (CanMove(map, nextPositionX, nextPositionY, wall) == false)
                 {
-                    Move(playerPosition, direction);
+                    Move(playerPosition, nextPositionX, nextPositionY);
                     score = TakeСandy(score, playerPosition, map, candy, empty);
                 }
             }
@@ -115,15 +118,21 @@ namespace BraveNewWorld
                 return true;
         }
 
-        private static void Move(int[] playerPosition, int[] direction)
+        private static void Move(int[] playerPosition, int nextPositionX, int nextPositionY)
         {
-            playerPosition[0] += direction[0];
-            playerPosition[1] += direction[1];
+            playerPosition[0] = nextPositionX;
+            playerPosition[1] = nextPositionY;
         }
 
-        private static bool CanMove(char[,] map, int[] playerPosition, int[] direction, char wall)
+        private static void GetNextPosition(ref int nextPositionX, ref int nextPositionY, int[] playerPosition, int[] direction)
         {
-            if (map[playerPosition[1] + direction[1], playerPosition[0] + direction[0]] == wall)
+            nextPositionX = playerPosition[0] + direction[0];
+            nextPositionY = playerPosition[1] + direction[1];
+        }
+
+        private static bool CanMove(char[,] map, int nextPositionX, int nextPositionY, char wall)
+        {
+            if (map[nextPositionY, nextPositionX] == wall)
                 return true;
             else
                 return false;
