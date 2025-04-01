@@ -38,7 +38,7 @@ namespace BraveNewWorld
             char left = 'a';
             char right = 'd';
             char exit = 'p';
-            bool isWork = true;
+            bool isExit = false;
             int[] playerPosition = { 1, 1 };
             int[] scorePosition = { 0, map.GetLength(1) };
             int nextPositionX = 0;
@@ -49,7 +49,7 @@ namespace BraveNewWorld
 
             Console.CursorVisible = false;
 
-            while (isWork)
+            while (isExit == false)
             {
                 Console.Clear();
 
@@ -58,13 +58,13 @@ namespace BraveNewWorld
                 ShowScore(score, scorePosition);
                 pressedKey = Console.ReadKey();
 
-                isWork = Exit(pressedKey, exit);
+                isExit = Exit(pressedKey, exit);
                 direction = GetDirection(pressedKey, up, down, left, right);
                 GetNextPosition(ref nextPositionX, ref nextPositionY, playerPosition, direction);
 
                 if (CanMove(map, nextPositionX, nextPositionY, wall) == false)
                 {
-                    Move(playerPosition, nextPositionX, nextPositionY);
+                    MovePlayer(playerPosition, nextPositionX, nextPositionY);
                     score = TakeСandy(score, playerPosition, map, candy, empty);
                 }
             }
@@ -78,6 +78,7 @@ namespace BraveNewWorld
                 {
                     Console.Write(map[i, j]);
                 }
+
                 Console.Write("\n");
             }
         }
@@ -112,13 +113,10 @@ namespace BraveNewWorld
 
         private static bool Exit(ConsoleKeyInfo pressedKey, char exit)
         {
-            if (pressedKey.KeyChar == exit)
-                return false;
-            else
-                return true;
+            return pressedKey.KeyChar == exit;
         }
 
-        private static void Move(int[] playerPosition, int nextPositionX, int nextPositionY)
+        private static void MovePlayer(int[] playerPosition, int nextPositionX, int nextPositionY)
         {
             playerPosition[0] = nextPositionX;
             playerPosition[1] = nextPositionY;
@@ -132,10 +130,7 @@ namespace BraveNewWorld
 
         private static bool CanMove(char[,] map, int nextPositionX, int nextPositionY, char wall)
         {
-            if (map[nextPositionY, nextPositionX] == wall)
-                return true;
-            else
-                return false;
+            return map[nextPositionY, nextPositionX] == wall;
         }
 
         private static int TakeСandy(int score, int[] playerPosition, char[,] map, char candy, char empty)
