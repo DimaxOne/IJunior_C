@@ -96,21 +96,13 @@ namespace BraveNewWorld
             int[] direction = { 0, 0 };
 
             if (pressedKey.KeyChar == up)
-            {
                 direction[1] = -1;
-            }
             else if (pressedKey.KeyChar == down)
-            {
                 direction[1] = 1;
-            }
             else if (pressedKey.KeyChar == left)
-            {
                 direction[0] = -1;
-            }
             else if (pressedKey.KeyChar == right)
-            {
                 direction[0] = 1;
-            }
 
             return direction;
         }
@@ -118,13 +110,9 @@ namespace BraveNewWorld
         private static bool Exit(ConsoleKeyInfo pressedKey, char exit)
         {
             if (pressedKey.KeyChar == exit)
-            {
                 return false;
-            }
             else
-            {
                 return true;
-            }
         }
 
         private static void Move(int[] playerPosition, int[] direction)
@@ -136,13 +124,9 @@ namespace BraveNewWorld
         private static bool CanMove(char[,] map, int[] playerPosition, int[] direction, char wall)
         {
             if (map[playerPosition[1] + direction[1], playerPosition[0] + direction[0]] == wall)
-            {
                 return true;
-            }
             else
-            {
                 return false;
-            }
         }
 
         private static int TakeСandy(int score, int[] playerPosition, char[,] map, char candy, char empty)
