@@ -48,14 +48,21 @@ namespace BraveNewWorld
                 DrawPlayer(playerPosition[0], playerPosition[1]);
                 ShowScore(score, scorePosition);
                 pressedKey = Console.ReadKey();
-                isWork = !Exit(pressedKey);
-                direction = GetDirection(pressedKey);
-                GetNextPosition(out nextPositionX, out nextPositionY, playerPosition, direction);
 
-                if (MoveIntoWall(map, nextPositionX, nextPositionY) == false)
+                if(TryExit(pressedKey))
                 {
-                    MovePlayer(playerPosition, nextPositionX, nextPositionY);
-                    score = TakeСandy(score, playerPosition, map);
+                    isWork = false;
+                }
+                else
+                {
+                    direction = GetDirection(pressedKey);
+                    GetNextPosition(out nextPositionX, out nextPositionY, playerPosition, direction);
+
+                    if (TryFindWall(map, nextPositionX, nextPositionY) == false)
+                    {
+                        MovePlayer(playerPosition, nextPositionX, nextPositionY);
+                        score = TakeСandy(score, playerPosition, map);
+                    }
                 }
             }
         }
@@ -107,7 +114,7 @@ namespace BraveNewWorld
             return direction;
         }
 
-        private static bool Exit(ConsoleKeyInfo pressedKey)
+        private static bool TryExit(ConsoleKeyInfo pressedKey)
         {
             char exitGame = 'p';
 
@@ -126,7 +133,7 @@ namespace BraveNewWorld
             nextPositionY = playerPosition[1] + direction[1];
         }
 
-        private static bool MoveIntoWall(char[,] map, int nextPositionX, int nextPositionY)
+        private static bool TryFindWall(char[,] map, int nextPositionX, int nextPositionY)
         {
             char wall = '#';
 
