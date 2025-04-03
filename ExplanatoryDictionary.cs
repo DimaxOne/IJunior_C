@@ -12,7 +12,7 @@ namespace ExplanatoryDictionary
             int[] valueNumbers = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
             FillDictionary(numbers, keyNumbers, valueNumbers);
-            GetNumber(GetUserInput("Напишите словом какое число вам нужно: "), numbers);
+            ShowNumber(GetUserInput("Напишите словом какое число вам нужно: "), numbers);
         }
 
         private static void FillDictionary(Dictionary<string, int> dictionary, string[] keyNumbers, int[] valueNumbers)
@@ -23,7 +23,7 @@ namespace ExplanatoryDictionary
             }
         }
 
-        private static void GetNumber(string userInput, Dictionary<string, int> numbers)
+        private static void ShowNumber(string userInput, Dictionary<string, int> numbers)
         {
             if (numbers.TryGetValue(userInput.ToLower(), out int value))
                 Console.WriteLine(value);
