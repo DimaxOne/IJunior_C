@@ -20,9 +20,7 @@ namespace MergingOneCollection
         {
             for (int i = 0; i < names.Length; i++)
             {
-                if (studentNames.Contains(names[i]))
-                    continue;
-                else
+                if (studentNames.Contains(names[i]) == false)
                     studentNames.Add(names[i]);
             }
         }
