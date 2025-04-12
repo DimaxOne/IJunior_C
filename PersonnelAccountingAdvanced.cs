@@ -56,32 +56,50 @@ namespace PersonnelAccountingAdvanced
         {
             string userPosition = GetUserInput("Введите должность сотрудника: ");
 
-            if (TryAddPosition(userPosition, personnelData))
-                AddPosition(personnelData, userPosition);
+            if (personnelData.ContainsKey(userPosition) == false)
+                personnelData.Add(userPosition, new List<string>());
 
-            AddFullName(personnelData, userPosition, GetUserInput("Введите полное имя сотрудника: "));
+            personnelData[userPosition].Add(GetUserInput("Введите полное имя сотрудника: "));
         }
 
         private static void RemoveEmployee(Dictionary<string, List<string>> personnelData)
         {
-            string userFullName = GetUserInput("Введите полное имя увольняемого сотрудника: ");
             string userPosition = GetUserInput("Введите должность увольняемого сотрудника: ");
 
             if (personnelData.TryGetValue(userPosition, out List<string> fullNames))
             {
-                if (TryRemoveEmployee(fullNames, userFullName))
+                Console.WriteLine("Полный список сотрудников: ");
+
+                for (int i = 0; i < fullNames.Count; i++)
                 {
-                    fullNames.Remove(userFullName);
-                    TryRemovePosition(personnelData, userPosition);
+                    Console.WriteLine($"{i + 1} - {fullNames[i]}");
+                }
+
+                string userIndex = GetUserInput("Введите номер удаляемого сотрудника: ");
+
+                if (int.TryParse(userIndex, out int index))
+                {
+                    index--;
+
+                    if (index >= 0 && index < fullNames.Count)
+                    {
+                        fullNames.RemoveAt(index);
+                        TryRemovePosition(personnelData, userPosition);
+                        Console.WriteLine("Сотрудник удален.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Такого сотрудника нет.");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Такого сотрудника нет.");
+                    Console.WriteLine("Введен некорректный индекс.");
                 }
             }
             else
             {
-                Console.WriteLine("Введена некорректная должность");
+                Console.WriteLine("Введена некорректная должность.");
             }
         }
 
@@ -100,29 +118,6 @@ namespace PersonnelAccountingAdvanced
             }
         }
 
-        private static void AddPosition(Dictionary<string, List<string>> personnelData, string position)
-        {
-            personnelData.Add(position, new List<string>());
-        }
-
-        private static void AddFullName(Dictionary<string, List<string>> personnelData, string position, string fullName)
-        {
-            personnelData[position].Add(fullName);
-        }
-
-        private static bool TryRemoveEmployee(List<string> fullNames, string userFullName)
-        {
-            bool canRemove = false;
-
-            foreach (string name in fullNames)
-            {
-                if (name == userFullName)
-                    canRemove = true;
-            }
-
-            return canRemove;
-        }
-
         private static void TryRemovePosition(Dictionary<string, List<string>> personnelData, string userPosition)
         {
             if (personnelData[userPosition].Count == 0)
@@ -134,21 +129,6 @@ namespace PersonnelAccountingAdvanced
             Console.Write(message);
 
             return Console.ReadLine();
-        }
-
-        private static bool TryAddPosition(string position, Dictionary<string, List<string>> personnelData)
-        {
-            bool isAdd = true;
-
-            foreach (string key in personnelData.Keys)
-            {
-                if (key == position)
-                {
-                    isAdd = false;
-                }
-            }
-
-            return isAdd;
         }
     }
 }
