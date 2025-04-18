@@ -16,16 +16,16 @@ namespace WorkingWithProperties
 
     class Player
     {
-        public int PositionX { get; private set; }
-        public int PositionY { get; private set; }
-        public char Symbol { get; private set; }
-
         public Player(int positionX, int positionY, char symbol)
         {
             PositionX = positionX;
             PositionY = positionY;
             Symbol = symbol;
         }
+
+        public int PositionX { get; private set; }
+        public int PositionY { get; private set; }
+        public char Symbol { get; private set; }
     }
 
     class Renderer
