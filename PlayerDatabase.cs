@@ -15,14 +15,14 @@ namespace PlayerDatabase
 
     class Database
     {
-        const string CommandAddPlayer = "1";
-        const string CommandBanPlayer = "2";
-        const string CommandUnbanPlayer = "3";
-        const string CommandRemovePlayer = "4";
-        const string CommandExit = "5";
+        private const string CommandAddPlayer = "1";
+        private const string CommandBanPlayer = "2";
+        private const string CommandUnbanPlayer = "3";
+        private const string CommandRemovePlayer = "4";
+        private const string CommandExit = "5";
 
-        private Dictionary<int, Player> players = new Dictionary<int, Player>();
-        private int _playersId = 1;
+        private Dictionary<int, Player> _players = new Dictionary<int, Player>();
+        private int _lastPlayerId = 1;
         private bool _isWork = true;
 
         public void Work()
@@ -72,8 +72,8 @@ namespace PlayerDatabase
 
             if(int.TryParse(GetUserInput("Введите уровень игрока"), out int level))
             {
-                players.Add(_playersId, new Player(_playersId, name, level));
-                _playersId++;
+                _players.Add(_lastPlayerId, new Player(_lastPlayerId, name, level));
+                _lastPlayerId++;
             }
             else
             {
@@ -83,42 +83,44 @@ namespace PlayerDatabase
 
         private void BanPlayer()
         {
-            bool isPlayer = false;
-            
-            if(int.TryParse(GetUserInput("Введите id игрока, которого нужно забанить"), out int userInput))
-            {
-                foreach (Player player in players.Values)
-                {
-                    if(player.Id == userInput)
-                    {
-                        isPlayer = true;
-                        player.Ban();
-                        Console.WriteLine("Игрок забанен.");
-                    }    
-                }
+            string userInput = GetUserInput("Введите id игрока, которого нужно забанить");
+            int playerIndex;
 
-                if(isPlayer == false)
-                    Console.WriteLine("Такого id нет.");
-            }
-            else
-            {
-                Console.WriteLine("Некорректный ввод.");
-            }
+            if (TryGetPlayer(_players, userInput, out playerIndex))
+                _players[playerIndex].Ban();
         }
 
         private void UnbanPlayer()
         {
-            bool isPlayer = false;
+            string userInput = GetUserInput("Введите id игрока, которого нужно разбанить");
+            int playerIndex;
 
-            if (int.TryParse(GetUserInput("Введите id игрока, которого нужно разбанить"), out int userInput))
+            if (TryGetPlayer(_players, userInput, out playerIndex))
+                _players[playerIndex].Unban();
+        }
+
+        private void RemovePlayer()
+        {
+            string userInput = GetUserInput("Введите id игрока, которого нужно удалить");
+            int playerIndex;
+
+            if (TryGetPlayer(_players, userInput, out playerIndex))
+                _players.Remove(playerIndex);
+        }
+
+        private bool TryGetPlayer(Dictionary<int, Player> players, string userInput, out int playerIndex)
+        {
+            bool isPlayer = false;
+            int playerKey = 0;
+
+            if (int.TryParse(userInput, out int userNumber))
             {
-                foreach (Player player in players.Values)
+                foreach (var player in players)
                 {
-                    if (player.Id == userInput)
+                    if (player.Value.Id == userNumber)
                     {
                         isPlayer = true;
-                        player.Unban();
-                        Console.WriteLine("Игрок разбанен.");
+                        playerKey = player.Key;
                     }
                 }
 
@@ -129,32 +131,10 @@ namespace PlayerDatabase
             {
                 Console.WriteLine("Некорректный ввод.");
             }
-        }
 
-        private void RemovePlayer()
-        {
-            bool isPlayer = false;
+            playerIndex = playerKey;
 
-            if (int.TryParse(GetUserInput("Введите id игрока для удаления"), out int userInput))
-            {
-                foreach (var player in players)
-                {
-                    if (player.Value.Id == userInput)
-                    {
-                        isPlayer = true;
-                        players.Remove(player.Key);
-                        Console.WriteLine("Угрок удален.");
-                        break;
-                    }    
-                }
-
-                if (isPlayer == false)
-                    Console.WriteLine("Такого id нет.");
-            }
-            else
-            {
-                Console.WriteLine("Некорректный ввод.");
-            }
+            return isPlayer;
         }
 
         private void ShowMenu()
@@ -169,9 +149,9 @@ namespace PlayerDatabase
 
         private void ShowPlayersInfo()
         {
-            foreach (Player player in players.Values)
+            foreach (Player player in _players.Values)
             {
-                Console.WriteLine($"{player.Id} - {player.NickName}, уровень {player.Level}, статус бана {player.IsBanned}.");
+                Console.WriteLine($"Id {player.Id} - {player.NickName}, уровень {player.Level}, статус бана {player.IsBanned}.");
             }
         }
 
