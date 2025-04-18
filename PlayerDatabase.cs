@@ -83,28 +83,25 @@ namespace PlayerDatabase
 
         private void BanPlayer()
         {
-            string userInput = GetUserInput("Введите id игрока, которого нужно забанить");
             int playerIndex;
 
-            if (TryGetPlayer(_players, userInput, out playerIndex))
+            if (TryGetPlayer(_players, GetUserInput("Введите id игрока, которого нужно забанить"), out playerIndex))
                 _players[playerIndex].Ban();
         }
 
         private void UnbanPlayer()
         {
-            string userInput = GetUserInput("Введите id игрока, которого нужно разбанить");
             int playerIndex;
 
-            if (TryGetPlayer(_players, userInput, out playerIndex))
+            if (TryGetPlayer(_players, GetUserInput("Введите id игрока, которого нужно разбанить"), out playerIndex))
                 _players[playerIndex].Unban();
         }
 
         private void RemovePlayer()
         {
-            string userInput = GetUserInput("Введите id игрока, которого нужно удалить");
             int playerIndex;
 
-            if (TryGetPlayer(_players, userInput, out playerIndex))
+            if (TryGetPlayer(_players, GetUserInput("Введите id игрока, которого нужно удалить"), out playerIndex))
                 _players.Remove(playerIndex);
         }
 
