@@ -15,8 +15,6 @@ namespace Shop
 
     class Shop
     {
-        private const string CommandExit = "Exit";
-
         private Seller _seller = new Seller(new List<Product>() {
                 new Product("Sword", 100),
                 new Product("Bow", 120),
@@ -24,46 +22,37 @@ namespace Shop
                 new Product("Mana bottle", 40)
             }, 0);
         private Buyer _buyer = new Buyer(280);
-        private bool _isWork = true;
-
-        private string _userInput;
-        private int _userIndex;
 
         public void Work()
         {
-            while (_isWork)
+            const string CommandExit = "Exit";
+
+            bool isWork = true;
+            string userInput;
+
+            while (isWork)
             {
                 ShowMenu();
 
                 _seller.ShowProducts();
-                _userInput = GetUserInput($"Вы можете выбрать товар или ввести {CommandExit} для выхода");
+                userInput = GetUserInput($"Вы можете выбрать товар или ввести {CommandExit} для выхода");
 
-                if (_userInput == CommandExit)
+                if (userInput == CommandExit)
                 {
-                    _isWork = false;
+                    isWork = false;
                 }
-                else if (TryGetIndex(_userInput, out _userIndex))
+                else if (int.TryParse(userInput, out int userIndex))
                 {
-                    _userIndex--;
+                    userIndex--;
 
-                    if (_userIndex >= 0 && _userIndex < _seller.ProductsCount)
-                    {
-                        Product product = _seller.GetProduct(_userIndex);
+                    Product product;
 
-                        if (_buyer.CanBuy(product.Price))
+                    if(_seller.TryGetProduct(userIndex, out product))
+                        if(_buyer.CanBuy(product.Price))
                         {
-                            _buyer.BuyProduct(product.Name, product.Price);
-                            _seller.SellProduct(_userIndex, product.Price);
+                            _buyer.BuyProduct(product);
+                            _seller.SellProduct(product, userIndex);
                         }
-                        else
-                        {
-                            Console.WriteLine("Недостаточно денег.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Такого товара нет.");
-                    }
                 }
                 else
                 {
@@ -81,13 +70,8 @@ namespace Shop
             ShowBuyerInfo();
             Console.WriteLine();
 
-            Console.WriteLine($"Добро пожаловать в магазин! У продавца сейчас {_seller.ShowMoney()} монет. " +
+            Console.WriteLine($"Добро пожаловать в магазин! У продавца сейчас {_seller.Money} монет. " +
                 $"У нас вы можете приобрести:");       
-        }
-
-        private bool TryGetIndex(string userInput, out int userIndex)
-        {
-            return int.TryParse(userInput, out userIndex);
         }
 
         private string GetUserInput(string message)
@@ -99,7 +83,7 @@ namespace Shop
 
         private void ShowBuyerInfo()
         {
-            Console.WriteLine($"У покупателя {_buyer.ShowMoney()} монет. В его сумке имеется:");
+            Console.WriteLine($"У покупателя {_buyer.Money} монет. В его сумке имеется:");
             _buyer.ShowProducts();
         }
     }
@@ -114,15 +98,25 @@ namespace Shop
             }
         }
 
-        public void SellProduct(int index, int money)
+        public void SellProduct(Product product, int index)
         {
-            Money += money;
+            Money += product.Price;
             Products.RemoveAt(index);
         }
 
-        public Product GetProduct(int index)
+        public bool TryGetProduct(int index, out Product product)
         {
-            return Products[index];
+            if (index >= 0 && index < Products.Count)
+            {
+                product = Products[index];
+                return true;
+            }
+            else
+            {
+                product = null;
+                Console.WriteLine("Такого товара нет.");
+                return false;
+            }
         }
     }
 
@@ -133,15 +127,23 @@ namespace Shop
             Money = money;
         }
 
-        public virtual void BuyProduct(string name, int price)
+        public void BuyProduct(Product product)
         {
-            Money -= price;
-            Products.Add(new Product(name, price));
+            Money -= product.Price;
+            Products.Add(product);
         }
 
         public bool CanBuy(int money)
         {
-            return Money >= money;
+            if (Money >= money)
+            {
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("Недостаточно денег.");
+                return false;
+            }
         }
     }
 
@@ -149,12 +151,12 @@ namespace Shop
     {
         protected List<Product> Products = new List<Product>();
 
-        protected int Money;
-
         public User(int money)
         {
             Money = money;
         }
+
+        public int Money { get; protected set; }
 
         public int ProductsCount => Products.Count;
 
@@ -165,11 +167,6 @@ namespace Shop
                 Console.Write(i + 1 + " - ");
                 Products[i].ShowInfo();
             }
-        }
-
-        public int ShowMoney()
-        {
-            return Money;
         }
     }
 
