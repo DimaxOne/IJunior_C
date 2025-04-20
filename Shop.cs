@@ -158,9 +158,7 @@ namespace Shop
 
         public int Money { get; protected set; }
 
-        public int ProductsCount => Products.Count;
-
-        public virtual void ShowProducts()
+        public void ShowProducts()
         {
             for (int i = 0; i < Products.Count; i++)
             {
