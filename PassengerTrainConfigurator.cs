@@ -15,7 +15,7 @@ namespace PassengerTrainConfigurator
 
     static class UserUtils
     {
-        static public string GetUserInput(string message)
+        public static string GetUserInput(string message)
         {
             Console.Write(message + ": ");
 
@@ -45,11 +45,11 @@ namespace PassengerTrainConfigurator
 
                 userInput = UserUtils.GetUserInput("Ваша команда");
 
-                if(userInput == CommandCreateTrain)
+                if (userInput == CommandCreateTrain)
                 {
                     _trains.Add(new Train());
                 }
-                else if(userInput == CommandExit)
+                else if (userInput == CommandExit)
                 {
                     _isWork = false;
                 }
