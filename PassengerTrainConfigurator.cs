@@ -13,9 +13,19 @@ namespace PassengerTrainConfigurator
         }
     }
 
+    static class UserUtils
+    {
+        static public string GetUserInput(string message)
+        {
+            Console.Write(message + ": ");
+
+            return Console.ReadLine();
+        }
+    }
+
     class Dispatcher
     {
-        private Dictionary<Direction, Train> _completeTrains = new Dictionary<Direction, Train>();
+        private List<Train> _trains = new List<Train>();
         private bool _isWork = true;
 
         public void Work()
@@ -33,11 +43,11 @@ namespace PassengerTrainConfigurator
                     $"\n{CommandCreateTrain} - создать поезд;" +
                     $"\n{CommandExit} - выход;\n");
 
-                userInput = GetUserInput("Ваша команда");
+                userInput = UserUtils.GetUserInput("Ваша команда");
 
                 if(userInput == CommandCreateTrain)
                 {
-                    CreateTrain();
+                    _trains.Add(new Train());
                 }
                 else if(userInput == CommandExit)
                 {
@@ -54,32 +64,11 @@ namespace PassengerTrainConfigurator
             }
         }
 
-        private void CreateTrain()
-        {
-            Random random = new Random();
-            string departurePoint = GetUserInput("Введите пункт отправления поезда");
-            string arrivalPoint = GetUserInput("Введите пункт прибытия поезда");
-
-            Direction direction = new Direction(departurePoint, arrivalPoint, random);
-
-            _completeTrains.Add(direction, new Train(direction.Tickets));
-        }
-
-        private string GetUserInput(string message)
-        {
-            Console.Write(message + ": ");
-
-            return Console.ReadLine();
-        }
-
         private void ShowInfo()
         {
-            foreach (var completeTrain in _completeTrains)
+            foreach (Train train in _trains)
             {
-                completeTrain.Key.ShowWay();
-                Console.Write("Общее количество пассажиров: " + completeTrain.Key.Tickets + ". ");
-                completeTrain.Value.ShowInfo();
-                Console.WriteLine();
+                train.ShowInfo();
             }
         }
     }
@@ -89,31 +78,65 @@ namespace PassengerTrainConfigurator
         private Random _random = new Random();
         private List<Carriage> _carriages = new List<Carriage>();
 
-        public Train(int tickets)
+        private Direction _direction;
+        private int _tickets;
+
+        public Train()
         {
-            while (tickets > 0)
-            {
-                _carriages.Add(new Carriage(_random));
+            _tickets = GetRandomTicketsCount(_random);
+            _direction = CreateDirection();
 
-                int remainingPassengers = tickets - _carriages[_carriages.Count - 1].MaximumPassengers;
-
-                if (remainingPassengers <= 0)
-                    _carriages[_carriages.Count - 1].IndicateCurrentPassengers(tickets);
-                else
-                    _carriages[_carriages.Count - 1].IndicateCurrentPassengers(_carriages[_carriages.Count - 1].MaximumPassengers);
-
-                tickets -= _carriages[_carriages.Count - 1].MaximumPassengers;
-            }
+            AddCarriage(_tickets);
         }
 
         public void ShowInfo()
         {
+            _direction.ShowWay();
+            Console.Write($" Общее количество пассажиров: {_tickets}. ");
+
             for (int i = 0; i < _carriages.Count; i++)
             {
                 Console.Write($"Вагон №{i + 1} количество пассажиров {_carriages[i].CurrentPassengers} из {_carriages[i].MaximumPassengers}| ");
             }
 
-            Console.WriteLine();
+            Console.WriteLine("\n");
+        }
+
+        private void AddCarriage(int tickets)
+        {
+            int lastCarriageIndex;
+            int remainingPassengers;
+
+            while (tickets > 0)
+            {
+                _carriages.Add(new Carriage(_random));
+
+                lastCarriageIndex = _carriages.Count - 1;
+                remainingPassengers = tickets - _carriages[lastCarriageIndex].MaximumPassengers;
+
+                if (remainingPassengers <= 0)
+                    _carriages[lastCarriageIndex].IndicateCurrentPassengers(tickets);
+                else
+                    _carriages[lastCarriageIndex].IndicateCurrentPassengers(_carriages[lastCarriageIndex].MaximumPassengers);
+
+                tickets -= _carriages[lastCarriageIndex].MaximumPassengers;
+            }
+        }
+
+        private int GetRandomTicketsCount(Random random)
+        {
+            int maximumRandomValue = 150;
+            int minimumRandomValue = 80;
+
+            return random.Next(minimumRandomValue, maximumRandomValue + 1);
+        }
+
+        private Direction CreateDirection()
+        {
+            string departurePoint = UserUtils.GetUserInput("Введите пункт отправления поезда");
+            string arrivalPoint = UserUtils.GetUserInput("Введите пункт прибытия поезда");
+
+            return new Direction(departurePoint, arrivalPoint);
         }
     }
 
@@ -149,26 +172,15 @@ namespace PassengerTrainConfigurator
         private string _departurePoint;
         private string _arrivalPoint;
 
-        public Direction(string departurePoint, string arrivalPoint, Random random)
+        public Direction(string departurePoint, string arrivalPoint)
         {
             _departurePoint = departurePoint;
             _arrivalPoint = arrivalPoint;
-            Tickets = GetRandomTicketsCount(random);
         }
-
-        public int Tickets { get; private set; }
 
         public void ShowWay()
         {
             Console.Write($"{_departurePoint} - {_arrivalPoint} : ");
-        }
-
-        private int GetRandomTicketsCount(Random random)
-        {
-            int maximumRandomValue = 150;
-            int minimumRandomValue = 80;
-
-            return random.Next(minimumRandomValue, maximumRandomValue + 1);
         }
     }
 }
