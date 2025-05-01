@@ -109,6 +109,8 @@ namespace GladiatorFights
         {
             Warrior warrior = null;
 
+            Console.Clear();
+
             while (warrior == null)
             {
                 if (TryCreateFighter(out warrior))
