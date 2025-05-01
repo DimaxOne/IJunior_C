@@ -32,15 +32,17 @@ namespace GladiatorFights
 
     class Arena
     {
-        private List<Warrior> _warriors = new List<Warrior>()
-        {
-            new Assassin("Убийца", 25, 10, 160, 50, 2),
-            new Barbarian("Варвар", 30, 5, 200, 2),
-            new Paladin("Паладин", 15, 15, 180, 120, 35),
-            new Mage("Маг", 15, 5, 130, 200, 40, 40),
-            new Monk("Монах", 30, 5, 170, 50)
-        };
+        private List<Warrior> _warriors = new List<Warrior>();
         private bool _isWork = true;
+
+        public Arena()
+        {
+            _warriors.Add(new Assassin("Убийца", 25, 10, 160, 50, 2));
+            _warriors.Add(new Barbarian("Варвар", 30, 5, 200, 2, 2));
+            _warriors.Add(new Paladin("Паладин", 15, 15, 180, 120, 35));
+            _warriors.Add(new Mage("Маг", 15, 5, 130, 200, 40, 40));
+            _warriors.Add(new Monk("Монах", 30, 5, 170, 50));
+        }
 
         public void Work()
         {
@@ -64,7 +66,7 @@ namespace GladiatorFights
                         break;
 
                     case CommandWatchFight:
-                        WatchFight();
+                        Fight();
                         break;
 
                     case CommandExit:
@@ -80,7 +82,7 @@ namespace GladiatorFights
             }
         }
 
-        private void WatchFight()
+        private void Fight()
         {
             Warrior firstWarrior = CreateWarrior("Первый");
             Warrior secondWarrior = CreateWarrior("Второй");
@@ -194,11 +196,15 @@ namespace GladiatorFights
 
         public virtual void TakeDamage(int damage)
         {
+            if (Armor > damage)
+                damage = Armor;
+
             Health -= damage - Armor;
         }
 
         public virtual void Attack(IDamageable warrior)
         {
+            ShowSimpleAttackMessage();
             warrior.TakeDamage(Damage);
         }
 
@@ -225,7 +231,7 @@ namespace GladiatorFights
         private int _сriticalHitChance;
         private int _damageMultiplier;
 
-        public Assassin(string name, int damage, int armor, int health, int сriticalHitChance, int damageMultiplier) : base(name, damage, armor, health) 
+        public Assassin(string name, int damage, int armor, int health, int сriticalHitChance, int damageMultiplier) : base(name, damage, armor, health)
         {
             _сriticalHitChance = сriticalHitChance;
             _damageMultiplier = damageMultiplier;
@@ -248,7 +254,6 @@ namespace GladiatorFights
             }
             else
             {
-                ShowSimpleAttackMessage();
                 warrior.TakeDamage(Damage);
             }
         }
@@ -268,26 +273,31 @@ namespace GladiatorFights
     {
         private int _counterDoubleDamage;
         private int _currentCounterDoubleDamage;
+        private int _countAttacksInAbility;
 
-        public Barbarian(string name, int damage, int armor, int health, int counterDoubleDamage) : base(name, damage, armor, health)
+        public Barbarian(string name, int damage, int armor, int health, int counterDoubleDamage, int countAttacksInAbility) : base(name, damage, armor, health)
         {
             _counterDoubleDamage = counterDoubleDamage;
             _currentCounterDoubleDamage = 0;
+            _countAttacksInAbility = countAttacksInAbility;
         }
 
         public override void Attack(IDamageable warrior)
         {
             if (_counterDoubleDamage == _currentCounterDoubleDamage)
             {
-                Console.WriteLine($"Боец {Name} совершает двойную атаку! Первый удар наносит {Damage} урона.");
-                warrior.TakeDamage(Damage);
-                Console.WriteLine($"Второй удар наносит {Damage} урона.");
-                warrior.TakeDamage(Damage);
+                Console.Write($"Боец {Name} совершает двойную атаку! ");
+
+                for (int i = 0; i < _countAttacksInAbility; i++)
+                {
+                    Console.WriteLine($"Удар {i + 1} наносит {Damage} урона. ");
+                    warrior.TakeDamage(Damage);
+                }
+
                 _currentCounterDoubleDamage = 0;
             }
             else
             {
-                ShowSimpleAttackMessage();
                 warrior.TakeDamage(Damage);
                 _currentCounterDoubleDamage++;
             }
@@ -300,7 +310,7 @@ namespace GladiatorFights
 
         public override Warrior Clone()
         {
-            return new Barbarian(Name, Damage, Armor, Health, _counterDoubleDamage);
+            return new Barbarian(Name, Damage, Armor, Health, _counterDoubleDamage, _countAttacksInAbility);
         }
     }
 
@@ -315,12 +325,6 @@ namespace GladiatorFights
             _currentRage = 0;
             _maximumRage = maximumRage;
             _powerOfHeal = healPower;
-        }
-
-        public override void Attack(IDamageable warrior)
-        {
-            ShowSimpleAttackMessage();
-            base.Attack(warrior);
         }
 
         public override void TakeDamage(int damage)
@@ -378,7 +382,6 @@ namespace GladiatorFights
             }
             else
             {
-                ShowSimpleAttackMessage();
                 base.Attack(warrior);
             }
         }
@@ -391,11 +394,6 @@ namespace GladiatorFights
         public override void ShowSkill()
         {
             Console.WriteLine("У бойца есть мана и пока её достаточно он применяет заклинание “Огненный шар”.");
-        }
-
-        public override void ShowStats()
-        {
-            base.ShowStats();
         }
 
         public override void ShowAdditionalStats()
@@ -415,7 +413,6 @@ namespace GladiatorFights
 
         public override void Attack(IDamageable warrior)
         {
-            ShowSimpleAttackMessage();
             base.Attack(warrior);
         }
 
@@ -424,14 +421,14 @@ namespace GladiatorFights
             int maximumRandomValue = 100;
             int minimumRandomValue = 0;
 
-            if(UserUtils.GenerateRandomNumber(minimumRandomValue, maximumRandomValue + 1) <= _dodgeСhance)
+            if (UserUtils.GenerateRandomNumber(minimumRandomValue, maximumRandomValue + 1) <= _dodgeСhance)
             {
                 Console.WriteLine($"Боец {Name} уклонился от атаки и не получил урон.");
             }
             else
             {
                 base.TakeDamage(damage);
-            }     
+            }
         }
 
         public override Warrior Clone()
