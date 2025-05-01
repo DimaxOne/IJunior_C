@@ -254,7 +254,7 @@ namespace GladiatorFights
             }
             else
             {
-                warrior.TakeDamage(Damage);
+                base.Attack(warrior);
             }
         }
 
@@ -298,7 +298,7 @@ namespace GladiatorFights
             }
             else
             {
-                warrior.TakeDamage(Damage);
+                base.Attack(warrior);
                 _currentCounterDoubleDamage++;
             }
         }
@@ -409,11 +409,6 @@ namespace GladiatorFights
         public Monk(string name, int damage, int armor, int health, int dodgeСhance) : base(name, damage, armor, health)
         {
             _dodgeСhance = dodgeСhance;
-        }
-
-        public override void Attack(IDamageable warrior)
-        {
-            base.Attack(warrior);
         }
 
         public override void TakeDamage(int damage)
