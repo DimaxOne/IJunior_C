@@ -144,8 +144,8 @@ namespace Supermarket
 
     class Client
     {
-        public int _maximumProductsInBasket;
-        public int _minimumProductsInBasket;
+        private int _maximumProductsInBasket;
+        private int _minimumProductsInBasket;
         private List<Product> _basket;
         private List<Product> _bag;
 
