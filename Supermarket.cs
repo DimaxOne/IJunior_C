@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Supermarket
 {
@@ -17,13 +16,6 @@ namespace Supermarket
     class UserUtils
     {
         private static Random s_random = new Random();
-
-        public static string GetUserInput(string message)
-        {
-            Console.Write(message + ": ");
-
-            return Console.ReadLine();
-        }
 
         public static int GenerateRandomNumber(int mininimumValue, int maximumValue)
         {
@@ -61,7 +53,7 @@ namespace Supermarket
 
             for (int i = 0; i < clientCount; i++)
             {
-                _clients.Enqueue(new Client(_products.ToList()));
+                _clients.Enqueue(new Client(new List<Product>(_products)));
             }
         }
 
@@ -78,7 +70,7 @@ namespace Supermarket
                 if (UserUtils.GenerateRandomNumber(minimumRandomValue, maximumRandomValue + 1) < chanceAddNewClient)
                 {
                     Console.WriteLine("В очереди появился новый клиент!");
-                    _clients.Enqueue(new Client(_products.ToList()));
+                    _clients.Enqueue(new Client(new List<Product>(_products)));
                 }
 
                 ServeClient();
@@ -94,7 +86,6 @@ namespace Supermarket
         private void ServeClient()
         {
             Client client = _clients.Dequeue();
-            int totalPrice = 0;
 
             Console.WriteLine($"У клиента {client.Money} рублей. В корзине клиента: ");
             client.ShowBasket();
@@ -194,6 +185,7 @@ namespace Supermarket
         public void BuyProducts()
         {
             int totalPrice = GetProductsSum();
+
             Money -= totalPrice;
             Console.WriteLine($"Клиент потратил {totalPrice} рублей и у него осталось {Money}.");
 
@@ -217,15 +209,8 @@ namespace Supermarket
         {
             int productIndex = UserUtils.GenerateRandomNumber(0, _basket.Count - 1);
 
-            if (_basket.Count >= 1)
-            {
-                Console.WriteLine($"Из корзины убрано: {_basket[productIndex].Name}");
-                _basket.RemoveAt(productIndex);
-            }
-            else
-            {
-                Console.WriteLine("Товаров не осталось.");
-            }
+            Console.WriteLine($"Из корзины убрано: {_basket[productIndex].Name}");
+            _basket.RemoveAt(productIndex);
         }
     }
 }
