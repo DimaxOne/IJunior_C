@@ -144,8 +144,6 @@ namespace Supermarket
 
     class Client
     {
-        private int _maximumRandomMoney;
-        private int _minimumRandomMoney;
         public int _maximumProductsInBasket;
         public int _minimumProductsInBasket;
         private List<Product> _basket;
@@ -153,11 +151,11 @@ namespace Supermarket
 
         public Client(List<Product> products)
         {
-            _maximumRandomMoney = 3000;
-            _minimumRandomMoney = 200;
+            int maximumRandomMoney = 3000;
+            int minimumRandomMoney = 200;
             _maximumProductsInBasket = 10;
             _minimumProductsInBasket = 3;
-            Money = UserUtils.GenerateRandomNumber(_minimumRandomMoney, _maximumRandomMoney + 1);
+            Money = UserUtils.GenerateRandomNumber(minimumRandomMoney, maximumRandomMoney + 1);
             _basket = new List<Product>();
             _bag = new List<Product>();
             AddProductsToBasket(products);
