@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Supermarket
 {
@@ -60,7 +61,7 @@ namespace Supermarket
 
             for (int i = 0; i < clientCount; i++)
             {
-                _clients.Enqueue(new Client(_products));
+                _clients.Enqueue(new Client(_products.ToList()));
             }
         }
 
@@ -77,7 +78,7 @@ namespace Supermarket
                 if (UserUtils.GenerateRandomNumber(minimumRandomValue, maximumRandomValue + 1) < chanceAddNewClient)
                 {
                     Console.WriteLine("В очереди появился новый клиент!");
-                    _clients.Enqueue(new Client(_products));
+                    _clients.Enqueue(new Client(_products.ToList()));
                 }
 
                 ServeClient();
@@ -112,9 +113,8 @@ namespace Supermarket
             }
             else
             {
-                totalPrice = client.GetProductsSum();
-                client.BuyProducts(totalPrice);
-                _money += totalPrice;
+                _money += client.GetProductsSum();
+                client.BuyProducts();
                 client.ShowBag();
             }
         }
@@ -144,8 +144,6 @@ namespace Supermarket
 
     class Client
     {
-        private int _maximumProductsInBasket;
-        private int _minimumProductsInBasket;
         private List<Product> _basket;
         private List<Product> _bag;
 
@@ -153,8 +151,7 @@ namespace Supermarket
         {
             int maximumRandomMoney = 3000;
             int minimumRandomMoney = 200;
-            _maximumProductsInBasket = 10;
-            _minimumProductsInBasket = 3;
+
             Money = UserUtils.GenerateRandomNumber(minimumRandomMoney, maximumRandomMoney + 1);
             _basket = new List<Product>();
             _bag = new List<Product>();
@@ -166,7 +163,11 @@ namespace Supermarket
 
         public void AddProductsToBasket(List<Product> products)
         {
-            for (int i = 0; i < UserUtils.GenerateRandomNumber(_minimumProductsInBasket, _maximumProductsInBasket + 1); i++)
+            int maximumProductsInBasket = 10;
+            int minimumProductsInBasket = 3;
+            int productInBasket = UserUtils.GenerateRandomNumber(minimumProductsInBasket, maximumProductsInBasket + 1);
+
+            for (int i = 0; i < productInBasket; i++)
             {
                 _basket.Add(products[UserUtils.GenerateRandomNumber(0, products.Count - 1)].Clone());
             }
@@ -186,20 +187,18 @@ namespace Supermarket
 
             foreach (Product product in _bag)
             {
-                Console.Write($"{product.Name}, ");
+                Console.Write($"{product.Name} ");
             }
         }
 
-        public void BuyProducts(int totalPrice)
+        public void BuyProducts()
         {
+            int totalPrice = GetProductsSum();
             Money -= totalPrice;
             Console.WriteLine($"Клиент потратил {totalPrice} рублей и у него осталось {Money}.");
 
-            for (int i = _basket.Count - 1; i >= 0; i--)
-            {
-                _bag.Add(_basket[i]);
-                _basket.RemoveAt(i);
-            }
+            _bag.AddRange(_basket);
+            _basket.Clear();
         }
 
         public int GetProductsSum()
