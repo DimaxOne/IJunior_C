@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace War
 {
@@ -31,8 +30,8 @@ namespace War
 
         public War()
         {
-            _firstPlatoon = new Platoon();
-            _secondPlatoon = new Platoon();
+            _firstPlatoon = new Platoon(CreateSoldiers());
+            _secondPlatoon = new Platoon(CreateSoldiers());
         }
 
         public void Fight()
@@ -56,27 +55,29 @@ namespace War
                 Console.Clear();
             }
 
-            if(_firstPlatoon.SoldiersCount <= 0 && _secondPlatoon.SoldiersCount <= 0)
-                Console.WriteLine("Ничья!");
-            else if (_firstPlatoon.SoldiersCount <= 0)
-                Console.WriteLine($"Победил взвод {secondPlatoonName}!");
-            else
-                Console.WriteLine($"Победил взвод {firstPlatoonName}!");
-        }     
+            ShowWinners(firstPlatoonName, secondPlatoonName);
+        }
 
         private void ShowInfo(string platoonNumber, Platoon platoon)
         {
             Console.WriteLine($"В взводе {platoonNumber} готовы воевать:");
             platoon.ShowSoldiers();
         }
-    }
 
-    class Platoon
-    {
-        private List<IDamagable> _soldiers = new List<IDamagable>();
-
-        public Platoon()
+        private void ShowWinners(string firstPlatoonName, string secondPlatoonName)
         {
+            if (_firstPlatoon.SoldiersCount <= 0 && _secondPlatoon.SoldiersCount <= 0)
+                Console.WriteLine("Ничья!");
+            else if (_firstPlatoon.SoldiersCount <= 0)
+                Console.WriteLine($"Победил взвод {secondPlatoonName}!");
+            else
+                Console.WriteLine($"Победил взвод {firstPlatoonName}!");
+        }
+
+        private List<Soldier> CreateSoldiers()
+        {
+            List<Soldier> soldiers = new List<Soldier>();
+
             string simpleSoldierType = "Simple";
             string rareSoldierType = "Rare";
             string epicSoldierType = "Epic";
@@ -91,10 +92,32 @@ namespace War
             int maximumLegendarySoldiersCount = 5;
             int minimumLegendarySoldiersCount = 3;
 
-            AddSoldiers(minimumSimpleSoldiersCount, maximumSimpleSoldiersCount, new Soldier(70, 15, 5, simpleSoldierType));
-            AddSoldiers(minimumRareSoldiersCount, maximumRareSoldiersCount, new RareSoldier(100, 15, 5, rareSoldierType));
-            AddSoldiers(minimumEpicSoldiersCount, maximumEpicSoldiersCount, new EpicSoldier(120, 20, 10, epicSoldierType));
-            AddSoldiers(minimumLegendarySoldiersCount, maximumLegendarySoldiersCount, new LegendarySoldier(150, 30, 15, legendarySoldierType));
+            AddSoldiers(minimumSimpleSoldiersCount, maximumSimpleSoldiersCount, new Soldier(70, 16, 5, simpleSoldierType), soldiers);
+            AddSoldiers(minimumRareSoldiersCount, maximumRareSoldiersCount, new RareSoldier(100, 16, 5, rareSoldierType), soldiers);
+            AddSoldiers(minimumEpicSoldiersCount, maximumEpicSoldiersCount, new EpicSoldier(120, 20, 10, epicSoldierType), soldiers);
+            AddSoldiers(minimumLegendarySoldiersCount, maximumLegendarySoldiersCount, new LegendarySoldier(150, 30, 15, legendarySoldierType), soldiers);
+
+            return soldiers;
+        }
+
+        private void AddSoldiers(int minimumCount, int maximumCount, Soldier soldier, List<Soldier> soldiers)
+        {
+            int soldiersCount = UserUtils.GenerateRandomNumber(minimumCount, maximumCount);
+
+            for (int i = 0; i < soldiersCount; i++)
+            {
+                soldiers.Add(soldier.Clone());
+            }
+        }
+    }
+
+    class Platoon
+    {
+        private List<Soldier> _soldiers;
+
+        public Platoon(List<Soldier> soldiers)
+        {
+            _soldiers = soldiers;
         }
 
         public int SoldiersCount => _soldiers.Count;
@@ -107,7 +130,7 @@ namespace War
             }
         }
 
-        public void Attack(List<IDamagable> soldiers)
+        public void Attack(List<Soldier> soldiers)
         {
             foreach (Soldier soldier in _soldiers)
             {
@@ -117,32 +140,16 @@ namespace War
 
         public void RemoveDefeated()
         {
-            List<Soldier> soldiers = new List<Soldier>();
-
-            foreach (Soldier soldier in _soldiers)
+            for (int i = _soldiers.Count - 1; i >= 0; i--)
             {
-                if (soldier.Health <= 0)
-                    continue;
-                else
-                    soldiers.Add(soldier);
+                if (_soldiers[i].Health <= 0)
+                    _soldiers.RemoveAt(i);
             }
-
-            _soldiers = new List<IDamagable>(soldiers);
         }
 
-        public List<IDamagable> GetSoldiers()
+        public List<Soldier> GetSoldiers()
         {
-            return _soldiers;
-        }
-
-        private void AddSoldiers(int minimumCount, int maximumCount, Soldier soldier)
-        {
-            int soldiersCount = UserUtils.GenerateRandomNumber(minimumCount, maximumCount);
-
-            for (int i = 0; i < soldiersCount; i++)
-            {
-                _soldiers.Add(soldier.Clone());
-            }
+            return new List<Soldier>(_soldiers);
         }
     }
 
@@ -161,9 +168,9 @@ namespace War
         public int Armor { get; private set; }
         public string Type { get; private set; }
 
-        public virtual void Attack(List<IDamagable> soldiers)
+        public virtual void Attack(List<Soldier> soldiers)
         {
-            soldiers[UserUtils.GenerateRandomNumber(0, soldiers.Count - 1)].TakeDamage(Damage); 
+            soldiers[UserUtils.GenerateRandomNumber(0, soldiers.Count - 1)].TakeDamage(Damage);
         }
 
         public virtual Soldier Clone()
@@ -194,7 +201,7 @@ namespace War
             _damageMultiplier = damageMultiplier;
         }
 
-        public override void Attack(List<IDamagable> soldiers)
+        public override void Attack(List<Soldier> soldiers)
         {
             soldiers[UserUtils.GenerateRandomNumber(0, soldiers.Count - 1)].TakeDamage(Damage * _damageMultiplier);
         }
@@ -209,7 +216,7 @@ namespace War
             _countOfTarget = countOfTarget;
         }
 
-        public override void Attack(List<IDamagable> soldiers)
+        public override void Attack(List<Soldier> soldiers)
         {
             if (soldiers.Count <= _countOfTarget)
             {
@@ -220,32 +227,13 @@ namespace War
             }
             else
             {
-                int[] indexToAttack = GetIndexesToAttack(soldiers.Count);
-
-                for (int i = 0; i < indexToAttack.Length; i++)
+                for (int i = 0; i < _countOfTarget; i++)
                 {
-                    soldiers[indexToAttack[i]].TakeDamage(Damage);
+                    int indexSoldier = UserUtils.GenerateRandomNumber(0, soldiers.Count - 1);
+                    soldiers[indexSoldier].TakeDamage(Damage);
+                    soldiers.RemoveAt(indexSoldier);
                 }
             }
-        }
-
-        private int[] GetIndexesToAttack(int soldiersCount)
-        {
-            int[] indexes = new int[_countOfTarget];
-
-            for (int i = 0; i < indexes.Length; i++)
-            {
-                int currentIndex = -1;
-
-                while (indexes.Contains(currentIndex))
-                {
-                    currentIndex = UserUtils.GenerateRandomNumber(0, soldiersCount - 1);
-                }
-
-                indexes[i] = currentIndex;
-            }
-
-            return indexes;
         }
     }
 
@@ -258,7 +246,7 @@ namespace War
             _countOfTarget = countOfTarget;
         }
 
-        public override void Attack(List<IDamagable> soldiers)
+        public override void Attack(List<Soldier> soldiers)
         {
             for (int i = 0; i < _countOfTarget; i++)
             {
