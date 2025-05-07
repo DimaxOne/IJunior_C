@@ -25,13 +25,15 @@ namespace War
 
     class War
     {
+        private PlatoonFactory _platoonFactory = new PlatoonFactory();
+
         private Platoon _firstPlatoon;
         private Platoon _secondPlatoon;
 
         public War()
         {
-            _firstPlatoon = new Platoon(CreateSoldiers());
-            _secondPlatoon = new Platoon(CreateSoldiers());
+            _firstPlatoon = _platoonFactory.Create();
+            _secondPlatoon = _platoonFactory.Create();
         }
 
         public void Fight()
@@ -72,42 +74,6 @@ namespace War
                 Console.WriteLine($"Победил взвод {secondPlatoonName}!");
             else
                 Console.WriteLine($"Победил взвод {firstPlatoonName}!");
-        }
-
-        private List<Soldier> CreateSoldiers()
-        {
-            List<Soldier> soldiers = new List<Soldier>();
-
-            string simpleSoldierType = "Simple";
-            string rareSoldierType = "Rare";
-            string epicSoldierType = "Epic";
-            string legendarySoldierType = "Legendary";
-
-            int maximumSimpleSoldiersCount = 20;
-            int minimumSimpleSoldiersCount = 14;
-            int maximumRareSoldiersCount = 12;
-            int minimumRareSoldiersCount = 8;
-            int maximumEpicSoldiersCount = 10;
-            int minimumEpicSoldiersCount = 6;
-            int maximumLegendarySoldiersCount = 5;
-            int minimumLegendarySoldiersCount = 3;
-
-            AddSoldiers(minimumSimpleSoldiersCount, maximumSimpleSoldiersCount, new Soldier(70, 16, 5, simpleSoldierType), soldiers);
-            AddSoldiers(minimumRareSoldiersCount, maximumRareSoldiersCount, new RareSoldier(100, 16, 5, rareSoldierType), soldiers);
-            AddSoldiers(minimumEpicSoldiersCount, maximumEpicSoldiersCount, new EpicSoldier(120, 20, 10, epicSoldierType), soldiers);
-            AddSoldiers(minimumLegendarySoldiersCount, maximumLegendarySoldiersCount, new LegendarySoldier(150, 30, 15, legendarySoldierType), soldiers);
-
-            return soldiers;
-        }
-
-        private void AddSoldiers(int minimumCount, int maximumCount, Soldier soldier, List<Soldier> soldiers)
-        {
-            int soldiersCount = UserUtils.GenerateRandomNumber(minimumCount, maximumCount);
-
-            for (int i = 0; i < soldiersCount; i++)
-            {
-                soldiers.Add(soldier.Clone());
-            }
         }
     }
 
@@ -150,6 +116,50 @@ namespace War
         public List<Soldier> GetSoldiers()
         {
             return new List<Soldier>(_soldiers);
+        }
+    }
+
+    class PlatoonFactory
+    {
+        public Platoon Create()
+        {
+            return new Platoon(CreateSoldiers());
+        }
+
+        private List<Soldier> CreateSoldiers()
+        {
+            List<Soldier> soldiers = new List<Soldier>();
+
+            string simpleSoldierType = "Simple";
+            string rareSoldierType = "Rare";
+            string epicSoldierType = "Epic";
+            string legendarySoldierType = "Legendary";
+
+            int maximumSimpleSoldiersCount = 20;
+            int minimumSimpleSoldiersCount = 14;
+            int maximumRareSoldiersCount = 12;
+            int minimumRareSoldiersCount = 8;
+            int maximumEpicSoldiersCount = 10;
+            int minimumEpicSoldiersCount = 6;
+            int maximumLegendarySoldiersCount = 5;
+            int minimumLegendarySoldiersCount = 3;
+
+            AddSoldiers(minimumSimpleSoldiersCount, maximumSimpleSoldiersCount, new Soldier(70, 16, 5, simpleSoldierType), soldiers);
+            AddSoldiers(minimumRareSoldiersCount, maximumRareSoldiersCount, new RareSoldier(100, 16, 5, rareSoldierType), soldiers);
+            AddSoldiers(minimumEpicSoldiersCount, maximumEpicSoldiersCount, new EpicSoldier(120, 20, 10, epicSoldierType), soldiers);
+            AddSoldiers(minimumLegendarySoldiersCount, maximumLegendarySoldiersCount, new LegendarySoldier(150, 30, 15, legendarySoldierType), soldiers);
+
+            return soldiers;
+        }
+
+        private void AddSoldiers(int minimumCount, int maximumCount, Soldier soldier, List<Soldier> soldiers)
+        {
+            int soldiersCount = UserUtils.GenerateRandomNumber(minimumCount, maximumCount);
+
+            for (int i = 0; i < soldiersCount; i++)
+            {
+                soldiers.Add(soldier.Clone());
+            }
         }
     }
 
@@ -218,21 +228,27 @@ namespace War
 
         public override void Attack(List<Soldier> soldiers)
         {
+            List<Soldier> targetToAttack = new List<Soldier>();
+
             if (soldiers.Count <= _countOfTarget)
             {
-                foreach (Soldier soldier in soldiers)
-                {
-                    soldier.TakeDamage(Damage);
-                }
+                targetToAttack = soldiers;
             }
             else
             {
+                List<Soldier> availableSoldiers = new List<Soldier>(soldiers);
+
                 for (int i = 0; i < _countOfTarget; i++)
                 {
-                    int indexSoldier = UserUtils.GenerateRandomNumber(0, soldiers.Count - 1);
-                    soldiers[indexSoldier].TakeDamage(Damage);
-                    soldiers.RemoveAt(indexSoldier);
+                    int indexSoldier = UserUtils.GenerateRandomNumber(0, availableSoldiers.Count - 1);
+                    targetToAttack.Add(availableSoldiers[indexSoldier]);
+                    availableSoldiers.RemoveAt(indexSoldier);
                 }
+            }
+
+            foreach (Soldier soldier in targetToAttack)
+            {
+                soldier.TakeDamage(Damage);
             }
         }
     }
