@@ -71,7 +71,8 @@ namespace Aquarium
                 switch (UserUtils.GetUserInput("Ваша команда"))
                 {
                     case CommandAddFish:
-                        TryAddFish();
+                        if(TryAddFish())
+                            Console.WriteLine("Рыбка добавлена");
                         break;
 
                     case CommandRemove:
