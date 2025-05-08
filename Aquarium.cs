@@ -76,7 +76,8 @@ namespace Aquarium
                         break;
 
                     case CommandRemove:
-                        TryRemoveFish();
+                        if(TryRemoveFish())
+                            Console.WriteLine("Рыбка удалена.");
                         break;
 
                     case CommandEndYear:
