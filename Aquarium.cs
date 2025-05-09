@@ -15,8 +15,6 @@ namespace Aquarium
 
     class UserUtils
     {
-        private static Random s_random = new Random();
-
         public static string GetUserInput(string message)
         {
             Console.Write(message + ": ");
