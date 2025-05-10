@@ -32,28 +32,26 @@ namespace Aquarium
 
     class Aquarist
     {
-        private FishCreator _fishFactory;
-        private List<Fish> _fishes;
+        private FishCreator _fishCreator;
         private Aquarium _aquarium;
 
         public Aquarist(int initialCountOfFish, int maximumFishCount)
         {
-            _fishes = new List<Fish>();
-            _fishFactory = new FishCreator();
+            _fishCreator = new FishCreator();
             _aquarium = new Aquarium(maximumFishCount);
 
-            CreateInitialFish(initialCountOfFish);
+            _aquarium.CreateInitialFish(_fishCreator, initialCountOfFish);
         }
-
+        
         public void Work()
         {
-            const string CommandAddFish = "1";
-            const string CommandRemove = "2";
-            const string CommandEndYear = "3";
-
-            while (_fishes.Count > 0)
+            while(_aquarium.FishCount > 0)
             {
-                ShowFishes();
+                const string CommandAddFish = "1";
+                const string CommandRemove = "2";
+                const string CommandEndYear = "3";
+
+                _aquarium.ShowFishes();
                 Console.WriteLine();
 
                 Console.WriteLine($"Вы можете:" +
@@ -64,21 +62,15 @@ namespace Aquarium
                 switch (UserUtils.GetUserInput("Ваша команда"))
                 {
                     case CommandAddFish:
-                        if (TryAddFish())
-                            Console.WriteLine("Рыбка добавлена");
-                        else
-                            Console.WriteLine("Не удалось добавить рыбку.");
-                            break;
+                        _aquarium.TryAddFish(_fishCreator);
+                        break;
 
                     case CommandRemove:
-                        if (TryRemoveFish())
-                            Console.WriteLine("Рыбка удалена.");
-                        else
-                            Console.WriteLine("Не удалось убрать рыбку.");
-                            break;
+                        _aquarium.TryRemoveFish();
+                        break;
 
                     case CommandEndYear:
-                        BecomeYearOlder();
+                        _aquarium.BecomeYearOlder();
                         break;
 
                     default:
@@ -89,8 +81,22 @@ namespace Aquarium
                 UserUtils.CleanConsole();
             }
         }
+    }
 
-        private bool TryRemoveFish()
+    class Aquarium
+    {
+        private List<Fish> _fishes;
+
+        public Aquarium(int maximumFishCount)
+        {
+            MaximumFishCount = maximumFishCount;
+            _fishes = new List<Fish>();
+        }
+
+        public int MaximumFishCount { get; private set; }
+        public int FishCount => _fishes.Count;
+
+        public void TryRemoveFish()
         {
             bool isRemove = false;
 
@@ -105,47 +111,35 @@ namespace Aquarium
                 }
             }
 
-            return isRemove;
+            if (isRemove)
+                Console.WriteLine("Рыбка удалена.");
+            else
+                Console.WriteLine("Не удалось убрать рыбку.");
         }
 
-        private bool TryCreateFish(int age)
+        public void TryAddFish(FishCreator fishCreator)
         {
-            bool isCreate = false;
-
-            if (int.TryParse(UserUtils.GetUserInput("Какой максимальный возраст рыбы"), out int maximumFishAge))
-            {
-                if (maximumFishAge > age && maximumFishAge >= 0)
-                {
-                    _fishes.Add(_fishFactory.Create(age, maximumFishAge));
-                    isCreate = true;
-                }
-            }
-
-            return isCreate;
-        }
-
-        private bool TryAddFish()
-        {
-            if (_fishes.Count < _aquarium.MaximumFishCount)
+            if (_fishes.Count < MaximumFishCount)
             {
                 if (int.TryParse(UserUtils.GetUserInput("Введите возраст рыбы"), out int userInput))
                 {
-                    return TryCreateFish(userInput);
+                    if (TryCreateFish(fishCreator, userInput))
+                        Console.WriteLine("Рыбка добавлена");
+                    else
+                        Console.WriteLine("Не удалось добавить рыбку.");
                 }
                 else
                 {
                     Console.WriteLine("Введены некорректные данные возраста рыбы.");
-                    return false;
                 }
             }
             else
             {
                 Console.WriteLine("В аквариуме нет места для новой рыбы.");
-                return false;
             }
         }
 
-        private void ShowFishes()
+        public void ShowFishes()
         {
             for (int i = 0; i < _fishes.Count; i++)
             {
@@ -154,33 +148,48 @@ namespace Aquarium
             }
         }
 
-        private void CreateInitialFish(int count)
+        public void CreateInitialFish(FishCreator fishCreator ,int count)
         {
+            int ageInitialFish = 0;
+            int maximumAgeInitialFish = 15;
+
             for (int i = 0; i < count; i++)
             {
-                _fishes.Add(_fishFactory.Create(0, 15));
+                _fishes.Add(fishCreator.Create(ageInitialFish, maximumAgeInitialFish));
             }
         }
 
-        private void BecomeYearOlder()
+        public void BecomeYearOlder()
         {
             foreach (Fish fish in _fishes)
             {
                 if (fish.IsLive)
-                    fish.GrowingOld();
+                    fish.GrowOlder();
             }
         }
-    }
 
-    class Aquarium
-    {
+        private bool TryCreateFish(FishCreator fishCreator, int age)
+        {
+            bool isCreate = false;
 
-        public Aquarium(int maximumFishCount)
-        {   
-            MaximumFishCount = maximumFishCount;
+            if (age < 0)
+            {
+                Console.WriteLine("Указан отрицательный возраст");
+            }
+            else
+            {
+                if (int.TryParse(UserUtils.GetUserInput("Какой максимальный возраст рыбы"), out int maximumFishAge))
+                {
+                    if (maximumFishAge > age && maximumFishAge >= 0)
+                    {
+                        _fishes.Add(fishCreator.Create(age, maximumFishAge));
+                        isCreate = true;
+                    }
+                }
+            }
+
+            return isCreate;
         }
-
-        public int MaximumFishCount { get; private set; }
     }
 
     class Fish
@@ -197,7 +206,7 @@ namespace Aquarium
 
         public bool IsLive { get; private set; }
 
-        public void GrowingOld()
+        public void GrowOlder()
         {
             if (IsLive && _age < _maximumAge)
                 _age++;
