@@ -40,7 +40,7 @@ namespace Aquarium
             _fishCreator = new FishCreator();
             _aquarium = new Aquarium(maximumFishCount);
 
-            _aquarium.CreateInitialFish(_fishCreator, initialCountOfFish);
+            CreateInitialFish(initialCountOfFish);
         }
 
         public void Work()
@@ -100,7 +100,7 @@ namespace Aquarium
                 return;
 
             if (maximumAge > age && maximumAge >= 0)
-                _aquarium.AddFish(new Fish(age, maximumAge));
+                _aquarium.AddFish(_fishCreator.Create(age, maximumAge));
             else
                 Console.WriteLine("Такие рыбки столько не проживают.");
         }
@@ -149,6 +149,19 @@ namespace Aquarium
                 Console.WriteLine("Введены некоректные данные.");
             }   
         }
+
+        public void CreateInitialFish(int count)
+        {
+            int ageInitialFish = 0;
+            int maximumAgeInitialFish = 15;
+
+            for (int i = 0; i < count; i++)
+            {
+                _aquarium.AddFish(_fishCreator.Create(ageInitialFish, maximumAgeInitialFish));
+            }
+
+            Console.Clear();
+        }
     }
 
     class Aquarium
@@ -182,17 +195,6 @@ namespace Aquarium
             {
                 Console.Write(i + 1 + " - ");
                 _fishes[i].ShowInfo();
-            }
-        }
-
-        public void CreateInitialFish(FishCreator fishCreator, int count)
-        {
-            int ageInitialFish = 0;
-            int maximumAgeInitialFish = 15;
-
-            for (int i = 0; i < count; i++)
-            {
-                _fishes.Add(fishCreator.Create(ageInitialFish, maximumAgeInitialFish));
             }
         }
 
