@@ -150,7 +150,7 @@ namespace Aquarium
             }   
         }
 
-        public void CreateInitialFish(int count)
+        private void CreateInitialFish(int count)
         {
             int ageInitialFish = 0;
             int maximumAgeInitialFish = 15;
