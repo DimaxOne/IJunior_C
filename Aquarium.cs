@@ -137,7 +137,6 @@ namespace Aquarium
                 if (fishIndex >= 0 && fishIndex < _aquarium.FishCount)
                 {
                     _aquarium.RemoveFish(fishIndex);
-                    Console.WriteLine("Рыбка удалена.");
                     return;
                 }
                 else
@@ -168,11 +167,13 @@ namespace Aquarium
         public void AddFish(Fish fish)
         {
             _fishes.Add(fish);
+            Console.WriteLine("Добавлена новая рыбка.");
         }
 
         public void RemoveFish(int index)
         {
             _fishes.RemoveAt(index);
+            Console.WriteLine("Рыбка удалена.");
         }
 
         public void ShowFishes()
