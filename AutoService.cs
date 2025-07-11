@@ -41,7 +41,8 @@ namespace AutoService
     {
         private int _money;
         private PartsWarehouse _partsWarehouse;
-        private Queue<Client> _clients;
+        private CarFactory _carFactory;
+        private Queue<Car> _cars;
         private int _repairCost;
         private int _fixedPenalty;
         private int _penaltyNonCompliantPart;
@@ -53,17 +54,18 @@ namespace AutoService
             _fixedPenalty = 2000;
             _penaltyNonCompliantPart = 500;
             _partsWarehouse = new PartsWarehouse();
-            _clients = new Queue<Client>();
+            _cars = new Queue<Car>();
+            _carFactory = new CarFactory();
 
             FillQueue();
         }
 
         public void Work()
         {
-            while (_clients.Count > 0)
+            while (_cars.Count > 0)
             {
                 Console.WriteLine($"Сейчас в кассе {_money} рублей.\n");
-                Car car = _clients.Dequeue().Car;
+                Car car = _cars.Dequeue();
                 car.ShowParts();
 
                 Console.WriteLine("Машина принята в ремонт. Неисправные детали:");
@@ -105,7 +107,7 @@ namespace AutoService
 
             for (int i = 0; i < clientsCount; i++)
             {
-                _clients.Enqueue(new Client());
+                _cars.Enqueue(_carFactory.Create());
             }
         }
 
@@ -170,8 +172,12 @@ namespace AutoService
 
             if (userCommand == CommandAgree)
             {
-                car.AddPart(part);
+                Part newPart = warehouseParts[indexPartOnWarehouse];
                 _partsWarehouse.RemovePart(indexPartOnWarehouse);
+
+                car.RemovePart(part.Name);
+                car.AddPart(newPart);
+
                 brokenParts.RemoveAt(brokenParts.Count - 1);
                 _money += part.Price + _repairCost;
                 Console.WriteLine($"Деталь заменена. Вы заплатили {part.Price} за новую деталь и {_repairCost} за ремонт.");
@@ -223,20 +229,6 @@ namespace AutoService
         }
     }
 
-    class Client
-    {
-        private CarFactory _carFactory;
-        private Car _car;
-
-        public Client()
-        {
-            _carFactory = new CarFactory();
-            _car = _carFactory.Create();
-        }
-
-        public Car Car => _car;
-    }
-
     class PartsWarehouse
     {
         private List<Part> _parts;
@@ -269,21 +261,13 @@ namespace AutoService
 
             _partsCount = UserUtils.GenerateRandomNumber(minimumPartsCount, maximumPartsCount);
 
-            List<Part> parts = new List<Part>()
-            {
-                _partFactory.Create("Мотор", 10000),
-                _partFactory.Create("Передняя дверь", 6000),
-                _partFactory.Create("Задняя дверь", 5500),
-                _partFactory.Create("Колесо", 5000),
-                _partFactory.Create("Фара", 1500),
-                _partFactory.Create("Стекло", 7000),
-                _partFactory.Create("Зеркало", 1000),
-                _partFactory.Create("Капот", 3500),
-            };
+            List<Part> parts = _partFactory.GetParts();
 
             for (int i = 0; i < _partsCount; i++)
             {
-                _parts.Add(parts[UserUtils.GenerateRandomNumber(0, parts.Count - 1)]);
+                int index = UserUtils.GenerateRandomNumber(0, parts.Count - 1);
+
+                _parts.Add(new Part(parts[index].Name, parts[index].Price));
             }
         }
     }
@@ -294,14 +278,27 @@ namespace AutoService
 
         public Car(List<Part> parts)
         {
-            _parts = parts;
+            _parts = new List<Part>();
 
+            AddParts(parts);
             BreakParts();
         }
 
         public List<Part> GetParts()
         {
             return new List<Part>(_parts);
+        }
+
+        public void RemovePart(string name)
+        {
+            if (_parts.Count > 0)
+            {
+                for (int i = 0; i < _parts.Count; i++)
+                {
+                    if (_parts[i].Name == name)
+                        _parts.RemoveAt(i);
+                }
+            }
         }
 
         public void AddPart(Part part)
@@ -317,23 +314,29 @@ namespace AutoService
             }
         }
 
+        private void AddParts(List<Part> parts)
+        {
+            for (int i = 0; i < parts.Count; i++)
+            {
+                _parts.Add(new Part(parts[i].Name, parts[i].Price));
+            }
+        }
+
         private void BreakParts()
         {
             int minimumBrokenCount = 1;
             int brokenPartsCount = UserUtils.GenerateRandomNumber(minimumBrokenCount, _parts.Count);
-            List<Part> _allParts = new List<Part>(_parts);
 
             for (int i = 0; i < brokenPartsCount; i++)
             {
                 if (brokenPartsCount > 1)
                 {
-                    int index = UserUtils.GenerateRandomNumber(0, _allParts.Count - 1);
-
-                    _allParts[index].Break();
+                    int index = UserUtils.GenerateRandomNumber(0, _parts.Count - 1);
+                    _parts[index].Break();
                 }
                 else
                 {
-                    _allParts[0].Break();
+                    _parts[0].Break();
                 }
             }
         }
@@ -362,9 +365,26 @@ namespace AutoService
 
     class PartFactory
     {
-        public Part Create(string name, int price)
+        private List<Part> _parts;
+
+        public PartFactory()
         {
-            return new Part(name, price);
+            _parts = new List<Part>
+            {
+                new Part("Мотор", 10000),
+                new Part("Передняя дверь", 6000),
+                new Part("Задняя дверь", 5500),
+                new Part("Колесо", 5000),
+                new Part("Фара", 1500),
+                new Part("Стекло", 7000),
+                new Part("Зеркало", 1000),
+                new Part("Капот", 3500),
+            };
+        }
+
+        public List<Part> GetParts()
+        {
+            return new List<Part>(_parts);
         }
     }
 
@@ -372,26 +392,14 @@ namespace AutoService
     {
         private PartFactory _partFactory;
 
-        public Car Create()
-        {
-            return new Car(GetParts());
-        }
-
-        private List<Part> GetParts()
+        public CarFactory()
         {
             _partFactory = new PartFactory();
+        }
 
-            return new List<Part>()
-            {
-                _partFactory.Create("Мотор", 10000),
-                _partFactory.Create("Передняя дверь", 6000),
-                _partFactory.Create("Задняя дверь", 5500),
-                _partFactory.Create("Колесо", 5000),
-                _partFactory.Create("Фара", 1500),
-                _partFactory.Create("Стекло", 7000),
-                _partFactory.Create("Зеркало", 1000),
-                _partFactory.Create("Капот", 3500),
-            };
+        public Car Create()
+        {
+            return new Car(_partFactory.GetParts());
         }
     }
 }
