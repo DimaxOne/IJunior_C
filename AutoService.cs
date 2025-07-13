@@ -73,24 +73,47 @@ namespace AutoService
                 List<Part> _brokenParts = GetBrokenParts(car);
                 ShowBrokenParts(_brokenParts);
 
-                if (TryStartRepairs())
+                if (TryStartRepairs() == false)
                 {
-                    for (int i = _brokenParts.Count; i > 0; i--)
-                    {
-                        Console.WriteLine($"Следующая деталь для замены {_brokenParts[i - 1].Name}.");
+                    PayPenalty(_fixedPenalty);
+                    Console.WriteLine("Вы отказались от начала ремонта и заплатили фиксированный штраф.");
+                    UserUtils.CleanConsole();
+                    continue;
+                }
 
-                        if (TryRepair(_brokenParts, car) == false)
+                bool isRepair = true;
+                const string CommandAgree = "1";
+                const string CommandExit = "2";
+
+                while (isRepair)
+                {
+                    Console.WriteLine($"Сейчас в кассе {_money} рублей.\n");
+                    car.ShowParts();
+
+                    Console.WriteLine($"\nВы можете выбрать деталь для замены или закончить ремонт." +
+                        $"\n{CommandAgree} - Выбрать деталь для замены;" +
+                        $"\n{CommandExit} - Отказаться от ремонта.");
+
+                    string userInput = GetUserCommand(CommandAgree, CommandExit);
+
+                    if (userInput == CommandExit)
+                    {
+                        List<Part> remainingBrokenParts = GetBrokenParts(car);
+                        Console.WriteLine("\nВы отказались от ремонта и заплатили штраф за каждую неподчиненную деталь.");
+
+                        for (int i = 0; i < remainingBrokenParts.Count; i++)
                         {
-                            PayPenalty(_brokenParts.Count);
-                            break;
+                            PayPenalty(_penaltyNonCompliantPart);
                         }
+
+                        isRepair = false;
+                    }
+                    else
+                    {
+                        TryRepair(car);
                     }
                 }
-                else
-                {
-                    _money += _fixedPenalty;
-                    Console.WriteLine("Вы отказались от начала ремонта и заплатили фиксированный штраф.");
-                }
+
 
                 UserUtils.CleanConsole();
             }
@@ -138,56 +161,60 @@ namespace AutoService
             const string CommandRepair = "1";
             const string CommandRefuseRepairs = "2";
 
-            Console.WriteLine($"Согласны ли вы начать ремонт автомобиля?" +
+            Console.WriteLine($"\nСогласны ли вы начать ремонт автомобиля?" +
                 $"\n{CommandRepair} - Да;" +
                 $"\n{CommandRefuseRepairs} - Отказаться (с уплатой штрафа).");
 
-            if (GetUserCommand(CommandRepair, CommandRefuseRepairs) == CommandRepair)
-                return true;
-
-            return false;
+            return (GetUserCommand(CommandRepair, CommandRefuseRepairs) == CommandRepair);
         }
 
-        private bool TryRepair(List<Part> brokenParts, Car car)
+        private bool TryRepair(Car car)
         {
-            const string CommandAgree = "1";
-            const string CommandRefuse = "2";
-
             List<Part> warehouseParts = _partsWarehouse.GetParts();
-            Part part = brokenParts[brokenParts.Count - 1];
+            string userIndex = UserUtils.GetUserInput("\nВыберите номер детали для замены");
+            List<Part> _carParts = car.GetParts();
 
+            int index;
             int indexPartOnWarehouse;
 
-            if (TryGetIndex(out indexPartOnWarehouse, warehouseParts, part) == false)
+            if (int.TryParse(userIndex, out int userNumber) == false)
             {
-                Console.WriteLine("Сожалеем, но эта деталь закончились на складе.");
-                return true;
-            }
-
-            Console.WriteLine($"Деталь есть в наличии. Вы согласны сделать ремонт этой детали?" +
-                $"\n{CommandAgree} - Да;" +
-                $"\n{CommandRefuse} - Нет (с оплатой штрафа за каждую непочиненную деталь).");
-
-            string userCommand = GetUserCommand(CommandAgree, CommandRefuse);
-
-            if (userCommand == CommandAgree)
-            {
-                Part newPart = warehouseParts[indexPartOnWarehouse];
-                _partsWarehouse.RemovePart(indexPartOnWarehouse);
-
-                car.RemovePart(part.Name);
-                car.AddPart(newPart);
-
-                brokenParts.RemoveAt(brokenParts.Count - 1);
-                _money += part.Price + _repairCost;
-                Console.WriteLine($"Деталь заменена. Вы заплатили {part.Price} за новую деталь и {_repairCost} за ремонт.");
-                return true;
+                Console.WriteLine("\nНекорректный ввод номера детали. Введите цифры.");
+                return false;
             }
             else
             {
-                Console.WriteLine("Вы оплачиваете штраф за каждую не отремонтированную делать.");
+                index = --userNumber;
+            }
+
+            if (index < 0 || index > _carParts.Count)
+            {
+                Console.WriteLine("\nНеверный ввод номера детали.");
                 return false;
             }
+
+            if (TryGetIndex(out indexPartOnWarehouse, warehouseParts, _carParts[index]) == false)
+            {
+                Console.WriteLine("\nСожалеем, но эта деталь закончились на складе.");
+                return true;
+            }
+
+            Part newPart = warehouseParts[indexPartOnWarehouse];
+            _partsWarehouse.RemovePart(indexPartOnWarehouse);
+
+            if (_carParts[index].IsBroken)
+            {
+                _money += _carParts[index].Price + _repairCost;
+                Console.WriteLine($"Деталь заменена. Вы заплатили {_carParts[index].Price} за новую деталь и {_repairCost} за ремонт.");
+            }
+            else
+            {
+                Console.WriteLine("Вы заменили рабочую деталь и не получили денег.");
+            }
+
+            car.ReplacePart(index, newPart);
+
+            return true;
         }
 
         private string GetUserCommand(string firstCommand, string secondCommand)
@@ -220,12 +247,12 @@ namespace AutoService
             return false;
         }
 
-        private void PayPenalty(int partsCount)
+        private void PayPenalty(int penalty)
         {
-            for (int i = 0; i < partsCount; i++)
-            {
-                _money += _penaltyNonCompliantPart;
-            }
+            if (_money - penalty >= 0)
+                _money -= penalty;
+            else
+                _money = 0;
         }
     }
 
@@ -289,21 +316,13 @@ namespace AutoService
             return new List<Part>(_parts);
         }
 
-        public void RemovePart(string name)
+        public void ReplacePart(int index, Part part)
         {
             if (_parts.Count > 0)
             {
-                for (int i = 0; i < _parts.Count; i++)
-                {
-                    if (_parts[i].Name == name)
-                        _parts.RemoveAt(i);
-                }
+                _parts.RemoveAt(index);
+                _parts.Insert(index, part);
             }
-        }
-
-        public void AddPart(Part part)
-        {
-            _parts.Add(part);
         }
 
         public void ShowParts()
@@ -324,20 +343,15 @@ namespace AutoService
 
         private void BreakParts()
         {
+            List<Part> partsToBroke = new List<Part>(_parts);
             int minimumBrokenCount = 1;
             int brokenPartsCount = UserUtils.GenerateRandomNumber(minimumBrokenCount, _parts.Count);
 
             for (int i = 0; i < brokenPartsCount; i++)
             {
-                if (brokenPartsCount > 1)
-                {
-                    int index = UserUtils.GenerateRandomNumber(0, _parts.Count - 1);
-                    _parts[index].Break();
-                }
-                else
-                {
-                    _parts[0].Break();
-                }
+                int index = UserUtils.GenerateRandomNumber(0, partsToBroke.Count - 1);
+                partsToBroke[index].Break();
+                partsToBroke.RemoveAt(index);
             }
         }
     }
@@ -356,9 +370,7 @@ namespace AutoService
 
         public void Break()
         {
-            if (IsBroken)
-                return;
-            else
+            if (IsBroken == false)
                 IsBroken = true;
         }
     }
