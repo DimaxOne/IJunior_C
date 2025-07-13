@@ -70,8 +70,8 @@ namespace AutoService
 
                 Console.WriteLine("Машина принята в ремонт. Неисправные детали:");
 
-                List<Part> _brokenParts = GetBrokenParts(car);
-                ShowBrokenParts(_brokenParts);
+                List<Part> brokenParts = GetBrokenParts(car);
+                ShowBrokenParts(brokenParts);
 
                 if (TryStartRepairs() == false)
                 {
@@ -136,16 +136,16 @@ namespace AutoService
 
         private List<Part> GetBrokenParts(Car car)
         {
-            List<Part> _parts = car.GetParts();
-            List<Part> _brokenParts = new List<Part>();
+            List<Part> parts = car.GetParts();
+            List<Part> brokenParts = new List<Part>();
 
-            for (int i = 0; i < _parts.Count; i++)
+            for (int i = 0; i < parts.Count; i++)
             {
-                if (_parts[i].IsBroken)
-                    _brokenParts.Add(_parts[i]);
+                if (parts[i].IsBroken)
+                    brokenParts.Add(parts[i]);
             }
 
-            return _brokenParts;
+            return brokenParts;
         }
 
         private void ShowBrokenParts(List<Part> parts)
@@ -168,44 +168,38 @@ namespace AutoService
             return (GetUserCommand(CommandRepair, CommandRefuseRepairs) == CommandRepair);
         }
 
-        private bool TryRepair(Car car)
+        private void TryRepair(Car car)
         {
             List<Part> warehouseParts = _partsWarehouse.GetParts();
             string userIndex = UserUtils.GetUserInput("\nВыберите номер детали для замены");
-            List<Part> _carParts = car.GetParts();
-
-            int index;
+            List<Part> carParts = car.GetParts();
+            int index = -1;
             int indexPartOnWarehouse;
 
             if (int.TryParse(userIndex, out int userNumber) == false)
-            {
                 Console.WriteLine("\nНекорректный ввод номера детали. Введите цифры.");
-                return false;
-            }
             else
-            {
                 index = --userNumber;
-            }
 
-            if (index < 0 || index > _carParts.Count)
+            if (index < 0 || index > carParts.Count)
             {
                 Console.WriteLine("\nНеверный ввод номера детали.");
-                return false;
+                return;
             }
 
-            if (TryGetIndex(out indexPartOnWarehouse, warehouseParts, _carParts[index]) == false)
+            if (TryGetIndex(out indexPartOnWarehouse, warehouseParts, carParts[index]) == false)
             {
                 Console.WriteLine("\nСожалеем, но эта деталь закончились на складе.");
-                return true;
+                return;
             }
 
             Part newPart = warehouseParts[indexPartOnWarehouse];
             _partsWarehouse.RemovePart(indexPartOnWarehouse);
 
-            if (_carParts[index].IsBroken)
+            if (carParts[index].IsBroken)
             {
-                _money += _carParts[index].Price + _repairCost;
-                Console.WriteLine($"Деталь заменена. Вы заплатили {_carParts[index].Price} за новую деталь и {_repairCost} за ремонт.");
+                _money += carParts[index].Price + _repairCost;
+                Console.WriteLine($"Деталь заменена. Вы заплатили {carParts[index].Price} за новую деталь и {_repairCost} за ремонт.");
             }
             else
             {
@@ -213,8 +207,6 @@ namespace AutoService
             }
 
             car.ReplacePart(index, newPart);
-
-            return true;
         }
 
         private string GetUserCommand(string firstCommand, string secondCommand)
@@ -260,7 +252,6 @@ namespace AutoService
     {
         private List<Part> _parts;
         private PartFactory _partFactory;
-        private int _partsCount;
 
         public PartsWarehouse()
         {
@@ -285,12 +276,11 @@ namespace AutoService
         {
             int maximumPartsCount = 60;
             int minimumPartsCount = 30;
-
-            _partsCount = UserUtils.GenerateRandomNumber(minimumPartsCount, maximumPartsCount);
+            int partsCount = UserUtils.GenerateRandomNumber(minimumPartsCount, maximumPartsCount);
 
             List<Part> parts = _partFactory.GetParts();
 
-            for (int i = 0; i < _partsCount; i++)
+            for (int i = 0; i < partsCount; i++)
             {
                 int index = UserUtils.GenerateRandomNumber(0, parts.Count - 1);
 
@@ -358,10 +348,11 @@ namespace AutoService
 
     class Part
     {
-        public Part(string name, int price, bool isBroken = false)
+        public Part(string name, int price)
         {
             Name = name;
             Price = price;
+            IsBroken = false;
         }
 
         public string Name { get; private set; }
