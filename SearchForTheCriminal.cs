@@ -47,14 +47,14 @@ namespace SearchForTheCriminal
 
                 Console.WriteLine("Для поиска подозреваемых введите следующие данные.");
 
-                if (GetNumber(out growth, "Рост: ") == false)
+                if (TryGetNumber(out growth, "Рост: ") == false)
                 {
                     Console.WriteLine("Введены некорректные данные роста");
                     UserUtils.CleanConsole();
                     continue;
                 }
 
-                if (GetNumber(out weight, "Вес: ") == false)
+                if (TryGetNumber(out weight, "Вес: ") == false)
                 {
                     Console.WriteLine("Введены некорректные данные веса");
                     UserUtils.CleanConsole();
@@ -83,7 +83,7 @@ namespace SearchForTheCriminal
             }
         }
 
-        private bool GetNumber(out int number, string message)
+        private bool TryGetNumber(out int number, string message)
         {
             Console.Write(message);
             string userInput = Console.ReadLine();
