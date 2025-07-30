@@ -28,15 +28,18 @@ namespace Expired
 
         public void ShowStews()
         {
-            Console.WriteLine();
-
-            foreach (Stew stew in _stews)
-            {
-                stew.ShowInfo();
-            }
+            ShowStews(_stews);
         }
 
-        public void ShowStews(List<Stew> stews)
+        public void ShowExpiredStews()
+        {
+            var expiredProducts = _stews.Where(stew => stew.YearOfManufacture + stew.ShelfLife < DateTime.Now.Year).ToList();
+
+            Console.Write("\nПросроченная тушенка:");
+            ShowStews(expiredProducts);
+        }
+
+        private void ShowStews(List<Stew> stews)
         {
             Console.WriteLine();
 
@@ -44,13 +47,6 @@ namespace Expired
             {
                 stew.ShowInfo();
             }
-        }
-
-        public void ShowExpiredStews()
-        {
-            var expiredProducts = _stews.Where(stew => stew.YearOfManufacture + stew.ShelfLife < DateTime.Now.Year).ToList();
-
-            ShowStews(expiredProducts);
         }
 
         private void FillStews()
