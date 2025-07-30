@@ -9,6 +9,7 @@ namespace TopPlayersServer
         static void Main(string[] args)
         {
             Server server = new Server();
+
             server.ShowPlayers();
             server.ShowTopPlayers();
         }
