@@ -18,7 +18,7 @@ namespace Amnesty
 
     class Arstotzka
     {
-        List<Prisoner> _prisoners;
+        private List<Prisoner> _prisoners;
 
         public Arstotzka()
         {
@@ -38,8 +38,7 @@ namespace Amnesty
             Console.WriteLine(separator + "В нашей стране произошла амнистия! " +
                 "Список заключеных изменен, многие были освобождены." + separator);
 
-            var amnestyPrisoners = _prisoners.Where(prisioner => prisioner.Crime != crimeForAmnesty).ToList();
-            _prisoners = amnestyPrisoners;
+            _prisoners = _prisoners.Where(prisioner => prisioner.Crime != crimeForAmnesty).ToList();
         }
 
         public void ShowPrisoners()
