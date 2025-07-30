@@ -11,7 +11,7 @@ namespace Amnesty
             Arstotzka arstotzka = new Arstotzka();
 
             arstotzka.ShowPrisoners();
-            arstotzka.GrantAmnesty();
+            arstotzka.Amnesty();
             arstotzka.ShowPrisoners();
         }
     }
@@ -27,7 +27,7 @@ namespace Amnesty
             FillPrisoners();
         }
 
-        public void GrantAmnesty()
+        public void Amnesty()
         {
             string crimeForAmnesty = "Антиправительственное";
             char separatorSymbol = '*';
