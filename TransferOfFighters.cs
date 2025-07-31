@@ -43,9 +43,9 @@ namespace TransferOfFighters
             string separator = "Б";
 
             Console.WriteLine("\nПроизведена перегруппировка солдат.\n");
-            var filteredSoldiers = _firstPlatoon.Where(soldier => soldier.FullName.ToUpper().StartsWith(separator)).ToList();
+            var filteredSoldiers = _firstPlatoon.Where(soldier => soldier.FullName.ToUpper().StartsWith(separator)).ToList();   
 
-            _firstPlatoon = _firstPlatoon.Where(soldier => !soldier.FullName.ToUpper().StartsWith(separator)).ToList();
+            _firstPlatoon = _firstPlatoon.Except(filteredSoldiers).ToList();
             _secondPlatoon = _secondPlatoon.Union(filteredSoldiers).ToList();
         }
 
